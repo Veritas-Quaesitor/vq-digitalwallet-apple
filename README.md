@@ -289,7 +289,7 @@ Apple introduced **QR-based handoff**:
 
 ---
 
-## 🚨 Error Codes
+## 🚨 Validation
 
 | Error                            | Description         | Solution                          |
 | -------------------------------- | ------------------- | --------------------------------- |
@@ -298,6 +298,26 @@ Apple introduced **QR-based handoff**:
 | `Invalid mode`                   | Invalid config      | Use `development` or `production` |
 | `Amount must be greater than 0`  | Validation failure  | Fix amount                        |
 | `Too many payment requests`      | Rate limit exceeded | Slow down requests                |
+
+---
+
+## 🚨 Error Codes
+
+The SDK provides a `code` property on error objects for programmatic handling.
+
+| Code     | Constant                     | Description                                |
+| -------- | ---------------------------- | ------------------------------------------ |
+| **E001** | `INVALID_CONFIG`             | Configuration object is malformed          |
+| **E002** | `MISSING_MERCHANT_ID`        | `merchantIdentifier` is missing            |
+| **E003** | `INVALID_MODE`               | Mode must be `development` or `production` |
+| **E100** | `BROWSER_UNSUPPORTED`        | Browser does not support Apple Pay         |
+| **E102** | `APPLE_PAY_UNAVAILABLE`      | Hardware/Wallet not set up                 |
+| **E201** | `RATE_LIMIT_EXCEEDED`        | Too many requests (3 per second)           |
+| **E202** | `SCRIPT_LOAD_TIMEOUT`        | Apple Pay JS failed to load in time        |
+| **E300** | `PAYMENT_CANCELLED`          | User closed the Apple Pay sheet            |
+| **E301** | `PAYMENT_FAILED`             | Payment rejected by Apple/Bank             |
+| **E303** | `INVALID_PAYMENT_DATA`       | Amount or Currency validation failed       |
+| **E304** | `MERCHANT_VALIDATION_FAILED` | Backend validation endpoint failed         |
 
 ---
 
