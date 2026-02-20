@@ -1,4 +1,4 @@
-# 🚀 Eccentric Apple Pay Client SDK
+# 🚀 Ecentric Apple Pay Client SDK
 
 [![npm version](https://badge.fury.io/js/ecentric-applepay-clientsdk.svg)](https://badge.fury.io/js/ecentric-applepay-clientsdk) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/) [![Browser Support](https://img.shields.io/badge/Browser-Modern-green.svg)](https://apps.abacus.ai/chatllm/?appId=118c521cbc&convoId=1100197764#browser-compatibility)
 
@@ -11,7 +11,7 @@ A lightweight, JavaScript SDK for integrating **Apple Pay** with secure payment 
 - 🔒 **Enterprise Security** - Advanced input validation and sanitization
 - ⚡ **Rate Limiting** - Protection against excessive payment requests
 - 🎯 **TypeScript Support** - Full `.d.ts` definitions included
-- 🍎 **Enabled for Apple Pay on the Web** (iOS, macOS & iOS 18+ QR handshake)
+- 🍎 **Enabled for Apple Pay on the Web**
 - 📱 **Mobile Optimized** - Designed for modern commerce flows
 - 🛡️ **Error Handling** - Clean, structured, comprehensive errors
 - 📊 **Session Management** - Secure token storage and retrieval
