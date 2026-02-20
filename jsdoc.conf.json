@@ -1,0 +1,27 @@
+{
+  "source": {
+    "include": ["./src/", "./README.md"],
+    "includePattern": "\\.(js)$",
+    "exclude": ["node_modules/", "test/", "coverage/", "dist/"]
+  },
+  "opts": {
+    "destination": "./docs/",
+    "template": "node_modules/better-docs",
+    "recurse": true,
+    "readme": "./README.md"
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false
+  },
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "metadata": {
+    "title": "EpsApplePay SDK Documentation",
+    "version": "1.1.0"
+  }
+}
