@@ -1,8 +1,7 @@
 /*!
- * @ecentric/eps-applepay-sdk v1.0.0
- * Type definitions for EpsApplePay SDK
+ * vq-digitalwallet-apple v1.1.0
+ * Type definitions for VqDigitalWalletApple SDK
  * Released under the MIT License.
- * (c) 2024 Ecentric Payment Solutions
  */
 
 // ============================================================================
@@ -24,28 +23,43 @@ export interface PaymentOptions {
 /**
  * SDK configuration options
  */
-export interface EpsApplePayConfig {
-  /** Apple Pay merchant identifier (required) */
+export interface VqDigitalWalletAppleConfig {
+  /** Apple Pay merchant identifier (required). Format: merchant.com.yourcompany */
   merchantIdentifier: string;
-  /** Display name shown to customer (required) */
+  /** Display name shown to customer (required). Max 100 chars. */
   merchantName: string;
-  /** SDK mode: 'development' | 'production'. Default: 'development' */
+  /** SDK mode. Default: 'development' */
   mode?: "development" | "production";
   /** Supported card networks. Default: ['masterCard', 'visa'] */
   allowedCardNetworks?: string[];
   /** Merchant capabilities. Default: ['supports3DS'] */
   merchantCapabilities?: string[];
   /** Apple Pay button style. Default: 'black' */
-  buttonStyle?: string;
+  buttonStyle?: "black" | "white" | "white-outline";
   /** Apple Pay button type. Default: 'buy' */
-  buttonType?: string;
+  buttonType?:
+    | "plain"
+    | "buy"
+    | "pay"
+    | "order"
+    | "donate"
+    | "subscribe"
+    | "checkout"
+    | "book"
+    | "add-money"
+    | "contribute"
+    | "reload"
+    | "rent"
+    | "save"
+    | "tip"
+    | "top-up";
   /** Button locale. Default: 'en-ZA' */
   buttonLocale?: string;
   /** Callback invoked when a payment token is generated or an error occurs */
   onTokenGenerated?: TokenGeneratedCallback | null;
   /** Script load timeout in ms. Default: 10000 */
   scriptLoadTimeout?: number;
-  /** Merchant validation endpoint URL (must support CORS if external) */
+  /** Merchant validation endpoint URL. Must start with https://. Max 512 chars. */
   validationEndpoint?: string;
   /** Payment request timeout in ms. Default: 30000 */
   requestTimeout?: number;
@@ -136,13 +150,14 @@ export interface BrowserSupportResult {
 // ============================================================================
 
 /**
- * EpsApplePay SDK for Apple Pay integration via the Payment Request API.
+ * VqDigitalWalletApple SDK for Apple Pay integration via the Payment Request API.
  *
  * @example
- * const applePay = new EpsApplePay({
+ * const applePay = new VqDigitalWalletApple({
  *   merchantIdentifier: 'merchant.com.example',
  *   merchantName: 'Example Store',
  *   mode: 'production',
+ *   validationEndpoint: 'https://your-server.com/applepay/validate',
  *   onTokenGenerated(token, error) {
  *     if (error) console.error('Payment failed:', error);
  *     else console.log('Token:', token);
@@ -156,14 +171,14 @@ export interface BrowserSupportResult {
  *   currency: 'ZAR',
  * });
  */
-export declare class EpsApplePay {
+export declare class VqDigitalWalletApple {
   // ── Static members ────────────────────────────────────────────────────────
 
   /** Current SDK version */
   static readonly version: string;
 
   /** Default configuration values */
-  static readonly defaults: Readonly<EpsApplePayConfig>;
+  static readonly defaults: Readonly<VqDigitalWalletAppleConfig>;
 
   /** Standardised error codes */
   static readonly ERROR_CODES: Readonly<Record<string, string>>;
@@ -175,10 +190,10 @@ export declare class EpsApplePay {
   static checkBrowserSupport(): BrowserSupportResult;
 
   /**
-   * Restores the previous `window.EpsApplePay` value and returns this
-   * version of the constructor (browser-global builds only).
+   * Restores the previous `window.VqDigitalWalletApple` value and returns
+   * this version of the constructor (browser-global builds only).
    */
-  static noConflict(): typeof EpsApplePay;
+  static noConflict(): typeof VqDigitalWalletApple;
 
   // ── Instance members ───────────────────────────────────────────────────────
 
@@ -186,20 +201,20 @@ export declare class EpsApplePay {
   readonly version: string;
 
   /** Resolved, merged configuration for this instance */
-  config: EpsApplePayConfig | null;
+  config: VqDigitalWalletAppleConfig | null;
 
   /**
-   * Creates a new EpsApplePay instance.
+   * Creates a new VqDigitalWalletApple instance.
    * Can be called with or without `new`.
    *
    * @param config - SDK configuration options.
    * @throws {Error} When the browser is unsupported or config is invalid.
    */
-  constructor(config: EpsApplePayConfig);
+  constructor(config: VqDigitalWalletAppleConfig);
 
   /**
-   * Initialises the SDK: loads the Apple Pay JS SDK and checks device
-   * readiness via `PaymentRequest.canMakePayment()`.
+   * Initialises the SDK: loads the Apple Pay JS SDK from CDN and checks
+   * device readiness via `PaymentRequest.canMakePayment()`.
    *
    * @returns Promise resolving to `true` when Apple Pay is available,
    *          `false` when the device/browser does not support it.
@@ -266,9 +281,10 @@ export declare class EpsApplePay {
   /**
    * Decodes a Base64 string and parses it as JSON.
    *
-   * @param base64String - Valid Base64 string.
+   * @param base64String - Valid Base64 string containing JSON.
    * @returns Parsed object.
-   * @throws {Error} When the string is not valid Base64 or not valid JSON.
+   * @throws {Error} 'Invalid base64 encoded payload' when not valid Base64.
+   * @throws {Error} 'Failed to decode base64 payload' when not valid JSON.
    */
   decodeFromBase64(base64String: string): object;
 
@@ -308,10 +324,28 @@ export declare class EpsApplePay {
 }
 
 // ============================================================================
+// CONSTRUCTOR TYPE (for factory / no-new usage)
+// ============================================================================
+
+/**
+ * Constructor interface — captures the static side of VqDigitalWalletApple,
+ * useful when passing the constructor itself as a value.
+ */
+export interface VqDigitalWalletAppleConstructor {
+  new(config: VqDigitalWalletAppleConfig): VqDigitalWalletApple;
+  (config: VqDigitalWalletAppleConfig): VqDigitalWalletApple;
+  readonly version: string;
+  readonly defaults: Readonly<VqDigitalWalletAppleConfig>;
+  readonly ERROR_CODES: Readonly<Record<string, string>>;
+  checkBrowserSupport(): BrowserSupportResult;
+  noConflict(): VqDigitalWalletAppleConstructor;
+}
+
+// ============================================================================
 // MODULE EXPORTS
 // ============================================================================
 
-export default EpsApplePay;
+export default VqDigitalWalletApple;
 
 // CommonJS interop
-export = EpsApplePay;
+export = VqDigitalWalletApple;

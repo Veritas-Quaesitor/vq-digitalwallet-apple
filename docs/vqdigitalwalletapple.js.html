@@ -1,15 +1,57 @@
-/*!
- * @ecentric/eps-applepay-sdk v1.0.0
- * Released under the MIT License.
- * (c) 2024 Ecentric Payment Solutions
- */
-(function (global, factory) {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>vqdigitalwalletapple.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3><a href="global.html">Global</a></h3>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">vqdigitalwalletapple.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>(function (global, factory) {
   "use strict";
 
-  if (typeof module === "object" && typeof module.exports === "object") {
+  if (typeof module === "object" &amp;&amp; typeof module.exports === "object") {
     // CommonJS/Node.js
     module.exports = factory(global, true);
-  } else if (typeof define === "function" && define.amd) {
+  } else if (typeof define === "function" &amp;&amp; define.amd) {
     // AMD
     define(function () {
       return factory(global);
@@ -30,7 +72,7 @@
     "use strict";
 
     // ============================================================================
-    // CONSTANTS & CONFIGURATION
+    // CONSTANTS &amp; CONFIGURATION
     // ============================================================================
 
     /**
@@ -38,7 +80,7 @@
      * @constant {string}
      * @readonly
      */
-    var VERSION = "1.0.0";
+    var VERSION = "1.1.0";
 
     /**
      * Apple Pay API version
@@ -90,7 +132,7 @@
     var DEFAULT_REQUEST_TIMEOUT_MS = 30000;
 
     /**
-     * Apple Pay SDK CDN URL with SRI hash
+     * Apple Pay SDK CDN URL
      * @constant {string}
      * @readonly
      */
@@ -123,7 +165,7 @@
 
     /**
      * SDK configuration options
-     * @typedef {Object} EpsApplePayConfig
+     * @typedef {Object} VqDigitalWalletAppleConfig
      * @property {string} merchantIdentifier - Apple Pay merchant identifier (required)
      * @property {string} merchantName - Display name shown to customer (required)
      * @property {string} [mode="development"] - SDK mode: 'development' or 'production'
@@ -193,7 +235,7 @@
 
     /**
      * Default configuration values
-     * @constant {EpsApplePayConfig}
+     * @constant {VqDigitalWalletAppleConfig}
      * @readonly
      */
     var DEFAULTS = {
@@ -226,7 +268,7 @@
 
     /**
      * Error codes for standardized error handling
-     * @constant {Object<string, string>}
+     * @constant {Object&lt;string, string>}
      * @readonly
      */
     var ERROR_CODES = {
@@ -268,6 +310,8 @@
      * @returns {Object} Extended target object
      * @throws {Error} When maximum depth exceeded (circular reference protection)
      */
+    var FORBIDDEN_KEYS = ['__proto__', 'constructor', 'prototype'];
+
     function extendDeep(target) {
       var sources = Array.prototype.slice.call(arguments, 1);
       var _depth = 0;
@@ -289,14 +333,15 @@
       sources.forEach(function (source) {
         if (!source || typeof source !== "object") return;
         Object.keys(source).forEach(function (key) {
+          if (FORBIDDEN_KEYS.indexOf(key) !== -1) return;
           var sourceVal = source[key];
           var targetVal = target[key];
           if (
-            sourceVal &&
-            typeof sourceVal === "object" &&
-            !Array.isArray(sourceVal) &&
-            targetVal &&
-            typeof targetVal === "object" &&
+            sourceVal &amp;&amp;
+            typeof sourceVal === "object" &amp;&amp;
+            !Array.isArray(sourceVal) &amp;&amp;
+            targetVal &amp;&amp;
+            typeof targetVal === "object" &amp;&amp;
             !Array.isArray(targetVal)
           ) {
             target[key] = extendDeep({}, targetVal, sourceVal, _depth + 1);
@@ -319,7 +364,7 @@
       if (typeof value === "string") return value.trim() === "";
       if (Array.isArray(value)) return value.length === 0;
       if (
-        typeof value === "object" &&
+        typeof value === "object" &amp;&amp;
         Object.prototype.toString.call(value) === "[object Object]"
       ) {
         return Object.keys(value).length === 0;
@@ -371,10 +416,10 @@
       }
 
       // Remove HTML/script injection vectors
-      var sanitized = input.replace(/[<>\\]/g, "");
+      var sanitized = input.replace(/[&lt;>\\]/g, "");
 
       // Encode quotes to preserve data while preventing injection
-      sanitized = sanitized.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      sanitized = sanitized.replace(/"/g, "&amp;quot;").replace(/'/g, "&amp;#39;");
 
       // Trim whitespace
       var trimmed = sanitized.trim();
@@ -395,7 +440,7 @@
     function generateUUID() {
       // Use crypto.randomUUID if available (modern browsers)
       if (
-        typeof crypto !== "undefined" &&
+        typeof crypto !== "undefined" &amp;&amp;
         typeof crypto.randomUUID === "function"
       ) {
         try {
@@ -407,14 +452,14 @@
 
       // Use crypto.getRandomValues if available
       if (
-        typeof crypto !== "undefined" &&
+        typeof crypto !== "undefined" &amp;&amp;
         typeof crypto.getRandomValues === "function"
       ) {
         var array = new Uint8Array(16);
         crypto.getRandomValues(array);
         // Set version (4) and variant (10) bits
-        array[6] = (array[6] & 0x0f) | 0x40;
-        array[8] = (array[8] & 0x3f) | 0x80;
+        array[6] = (array[6] &amp; 0x0f) | 0x40;
+        array[8] = (array[8] &amp; 0x3f) | 0x80;
 
         var hex = Array.prototype.map
           .call(array, function (byte) {
@@ -433,11 +478,11 @@
 
       // Fallback for legacy environments (less secure)
       if (
-        typeof console !== "undefined" &&
+        typeof console !== "undefined" &amp;&amp;
         typeof console.warn === "function"
       ) {
         console.warn(
-          "[EpsApplePay] Using insecure UUID generation (Math.random). " +
+          "[VqDigitalWalletApple] Using insecure UUID generation (Math.random). " +
             "Upgrade browser or add crypto polyfill for production use.",
         );
       }
@@ -446,7 +491,7 @@
         /[xy]/g,
         function (c) {
           var r = (Math.random() * 16) | 0;
-          var v = c === "x" ? r : (r & 0x3) | 0x8;
+          var v = c === "x" ? r : (r &amp; 0x3) | 0x8;
           return v.toString(16);
         },
       );
@@ -492,7 +537,7 @@
      * @private
      * @param {number} timeout - Timeout in milliseconds
      * @param {string} [cspNonce] - CSP nonce for script element
-     * @returns {Promise<boolean>} Promise resolving when script is loaded
+     * @returns {Promise&lt;boolean>} Promise resolving when script is loaded
      */
     function loadApplePaySDK(timeout, cspNonce) {
       // Return existing promise if already loading
@@ -504,7 +549,7 @@
       var existingScript = document.querySelector(
         'script[src*="applepay.cdn-apple.com"]',
       );
-      if (existingScript && existingScript.readyState !== "loading") {
+      if (existingScript &amp;&amp; existingScript.readyState !== "loading") {
         return Promise.resolve(true);
       }
 
@@ -632,16 +677,16 @@
     }
 
     // ============================================================================
-    // MAIN EPSAPPLEPAY CONSTRUCTOR
+    // MAIN VQDIGITALWALLETAPPLE CONSTRUCTOR
     // ============================================================================
 
     /**
-     * EpsApplePay SDK for Apple Pay integration
+     * VqDigitalWalletApple SDK for Apple Pay integration
      * @constructor
-     * @param {EpsApplePayConfig} config - Configuration object
+     * @param {VqDigitalWalletAppleConfig} config - Configuration object
      * @throws {Error} When configuration is invalid
      * @example
-     * var applePay = new EpsApplePay({
+     * var applePay = new VqDigitalWalletApple({
      *   merchantIdentifier: 'merchant.com.example',
      *   merchantName: 'Example Store',
      *   mode: 'production',
@@ -651,9 +696,9 @@
      *   }
      * });
      */
-    function EpsApplePay(config) {
-      if (!(this instanceof EpsApplePay)) {
-        return new EpsApplePay(config);
+    function VqDigitalWalletApple(config) {
+      if (!(this instanceof VqDigitalWalletApple)) {
+        return new VqDigitalWalletApple(config);
       }
       return this.init(config);
     }
@@ -662,8 +707,8 @@
     // PROTOTYPE METHODS
     // ============================================================================
 
-    EpsApplePay.prototype = {
-      constructor: EpsApplePay,
+    VqDigitalWalletApple.prototype = {
+      constructor: VqDigitalWalletApple,
 
       /**
        * SDK version
@@ -674,8 +719,8 @@
 
       /**
        * Initializes the SDK instance
-       * @param {EpsApplePayConfig} config - Configuration options
-       * @returns {EpsApplePay} This instance for chaining
+       * @param {VqDigitalWalletAppleConfig} config - Configuration options
+       * @returns {VqDigitalWalletApple} This instance for chaining
        * @throws {Error} When browser unsupported or config invalid
        */
       init: function (config) {
@@ -709,7 +754,7 @@
         this._initialized = true;
 
         if (this.config.mode === "development") {
-          console.log("[EpsApplePay] Instance initialized:", this._instanceId);
+          console.log("[VqDigitalWalletApple] Instance initialized:", this._instanceId);
         }
 
         return this;
@@ -770,9 +815,40 @@
           errors.push("merchantCapabilities must be a non-empty array");
         }
 
+        // Validate buttonStyle
+        var validButtonStyles = ['black', 'white', 'white-outline'];
+        if (validButtonStyles.indexOf(config.buttonStyle) === -1) {
+          errors.push(
+            "Invalid buttonStyle '" + config.buttonStyle + "'. Must be one of: " +
+              validButtonStyles.join(', ')
+          );
+        }
+
+        // Validate buttonType
+        var validButtonTypes = [
+          'plain', 'buy', 'pay', 'order', 'donate', 'subscribe', 'checkout',
+          'book', 'add-money', 'contribute', 'reload', 'rent', 'save', 'tip', 'top-up'
+        ];
+        if (validButtonTypes.indexOf(config.buttonType) === -1) {
+          errors.push(
+            "Invalid buttonType '" + config.buttonType + "'. Must be one of: " +
+              validButtonTypes.join(', ')
+          );
+        }
+
+        // Validate validationEndpoint if provided
+        if (!isNullOrEmpty(config.validationEndpoint)) {
+          if (config.validationEndpoint.length > 512) {
+            errors.push("validationEndpoint exceeds maximum allowed length (512 chars)");
+          }
+          if (config.validationEndpoint.indexOf('https://') !== 0) {
+            errors.push("validationEndpoint must start with https://");
+          }
+        }
+
         // Validate callback if provided
         if (
-          config.onTokenGenerated !== null &&
+          config.onTokenGenerated !== null &amp;&amp;
           typeof config.onTokenGenerated !== "function"
         ) {
           errors.push("onTokenGenerated must be a function or null");
@@ -807,7 +883,7 @@
        * @returns {ErrorInfo} Structured error information
        */
       logError: function (message, error, context, requestId) {
-        var errorCode = (error && error.code) || ERROR_CODES.VALIDATION_ERROR;
+        var errorCode = (error &amp;&amp; error.code) || ERROR_CODES.VALIDATION_ERROR;
 
         var errorInfo = {
           code: errorCode,
@@ -819,14 +895,14 @@
           requestId: requestId || this._instanceId,
         };
 
-        if (this.config && this.config.mode === "development") {
-          console.error("[EpsApplePay] Error:", errorInfo);
-          if (error && error.stack) {
-            console.error("[EpsApplePay] Stack:", error.stack);
+        if (this.config &amp;&amp; this.config.mode === "development") {
+          console.error("[VqDigitalWalletApple] Error:", errorInfo);
+          if (error &amp;&amp; error.stack) {
+            console.error("[VqDigitalWalletApple] Stack:", error.stack);
           }
         } else {
           // Production: minimal logging, no stack traces
-          console.error("[EpsApplePay] " + message);
+          console.error("[VqDigitalWalletApple] " + message);
         }
 
         return errorInfo;
@@ -834,7 +910,7 @@
 
       /**
        * Initializes Apple Pay and checks device readiness
-       * @returns {Promise<boolean>} Promise resolving to readiness status
+       * @returns {Promise&lt;boolean>} Promise resolving to readiness status
        * @throws {Error} When initialization fails
        */
       initialize: function () {
@@ -862,7 +938,7 @@
       /**
        * Checks if Apple Pay is available on this device/browser
        * @private
-       * @returns {Promise<boolean>} Promise resolving to availability status
+       * @returns {Promise&lt;boolean>} Promise resolving to availability status
        */
       _checkReadyToPay: function () {
         var self = this;
@@ -871,7 +947,7 @@
           // Check for Payment Request API
           if (typeof window.PaymentRequest === "undefined") {
             if (this.config.mode === "development") {
-              console.warn("[EpsApplePay] Payment Request API not supported");
+              console.warn("[VqDigitalWalletApple] Payment Request API not supported");
             }
             this._isReadyToPay = false;
             return Promise.resolve(false);
@@ -914,10 +990,10 @@
 
               if (self.config.mode === "development") {
                 if (canPay) {
-                  console.log("[EpsApplePay] Apple Pay is available");
+                  console.log("[VqDigitalWalletApple] Apple Pay is available");
                 } else {
                   console.warn(
-                    "[EpsApplePay] Apple Pay not available on this device",
+                    "[VqDigitalWalletApple] Apple Pay not available on this device",
                   );
                 }
               }
@@ -985,8 +1061,8 @@
 
         // Use CSS custom property for appearance if supported, fallback otherwise
         if (
-          typeof CSS !== "undefined" &&
-          CSS.supports &&
+          typeof CSS !== "undefined" &amp;&amp;
+          CSS.supports &amp;&amp;
           CSS.supports("appearance", "-apple-pay-button")
         ) {
           button.style.appearance = "-apple-pay-button";
@@ -998,7 +1074,7 @@
           event.stopPropagation();
 
           try {
-            self.requestPayment(paymentData).catch(function (err) {
+            self.requestPayment(paymentData).catch(function () {
               // Error already logged in requestPayment
             });
           } catch (error) {
@@ -1009,7 +1085,7 @@
         button.addEventListener("click", handleClick);
 
         // Store cleanup function on button for later removal
-        button._epsCleanup = function () {
+        button._vqCleanup = function () {
           button.removeEventListener("click", handleClick);
         };
 
@@ -1053,7 +1129,7 @@
           var amountStr = paymentData.amount.toFixed(2);
           var amountNum = parseFloat(amountStr);
 
-          if (amountNum <= 0) {
+          if (amountNum &lt;= 0) {
             errors.push("amount must be greater than 0");
           } else if (amountNum > 999999.99) {
             errors.push("amount exceeds maximum allowed (999999.99)");
@@ -1118,7 +1194,7 @@
       /**
        * Initiates payment request through Apple Pay
        * @param {PaymentData} paymentData - Payment transaction data
-       * @returns {Promise<PaymentResult>} Promise resolving to payment result
+       * @returns {Promise&lt;PaymentResult>} Promise resolving to payment result
        * @throws {Error} When payment request fails
        */
       requestPayment: function (paymentData) {
@@ -1173,7 +1249,7 @@
               self._cleanupPaymentRequest();
 
               // Don't log user cancellation as error
-              if (err && err.name === "AbortError") {
+              if (err &amp;&amp; err.name === "AbortError") {
                 var cancelError = new Error("Payment was cancelled by user");
                 cancelError.code = ERROR_CODES.PAYMENT_CANCELLED;
                 self.invokeCallback(null, cancelError);
@@ -1255,7 +1331,7 @@
       _handlePaymentMethodChange: function (event) {
         if (this.config.mode === "development") {
           console.log(
-            "[EpsApplePay] Payment method changed:",
+            "[VqDigitalWalletApple] Payment method changed:",
             event.methodName,
           );
         }
@@ -1398,7 +1474,7 @@
             }
 
             if (self.config.mode === "development") {
-              console.log("[EpsApplePay] Merchant validation successful");
+              console.log("[VqDigitalWalletApple] Merchant validation successful");
             }
 
             // Complete with merchant session
@@ -1421,7 +1497,7 @@
        * @private
        * @param {PaymentResponse} paymentResponse - Payment response from Apple Pay
        * @param {string} requestId - Request identifier
-       * @returns {Promise<PaymentResult>} Payment result
+       * @returns {Promise&lt;PaymentResult>} Payment result
        */
       _processPaymentResponse: function (paymentResponse, requestId) {
         var self = this;
@@ -1429,12 +1505,8 @@
         try {
           var details = paymentResponse.details;
 
-          // if (!details || !details.paymentData) {
-          //   throw new Error("Invalid payment response: missing payment data");
-          // }
-
           if (this.config.mode === "development") {
-            console.log("[EpsApplePay] Payment response received");
+            console.log("[VqDigitalWalletApple] Payment response received");
           }
 
           // Serialize and encode token
@@ -1480,7 +1552,7 @@
 
           // Attempt to fail the payment UI
           if (
-            paymentResponse &&
+            paymentResponse &amp;&amp;
             typeof paymentResponse.complete === "function"
           ) {
             paymentResponse.complete("fail");
@@ -1570,13 +1642,13 @@
        */
       decodeFromBase64: function (base64String) {
         if (!isValidBase64(base64String)) {
-          throw new Error("Invalid Base64 string");
+          throw new Error("Invalid base64 encoded payload");
         }
         try {
           var decoded = atob(base64String);
           return JSON.parse(decoded);
         } catch (e) {
-          throw new Error("Base64 decoding failed: " + e.message);
+          throw new Error("Failed to decode base64 payload");
         }
       },
 
@@ -1613,7 +1685,7 @@
 
       /**
        * Aborts any in-progress payment request
-       * @returns {Promise<void>}
+       * @returns {Promise&lt;void>}
        */
       abort: function () {
         if (this._abortController) {
@@ -1621,7 +1693,7 @@
         }
 
         if (
-          this._currentPaymentRequest &&
+          this._currentPaymentRequest &amp;&amp;
           typeof this._currentPaymentRequest.abort === "function"
         ) {
           try {
@@ -1643,10 +1715,10 @@
         this.abort();
 
         // Clean up all created buttons
-        if (this._createdButtons && this._createdButtons.length > 0) {
+        if (this._createdButtons &amp;&amp; this._createdButtons.length > 0) {
           this._createdButtons.forEach(function (button) {
-            if (button._epsCleanup) {
-              button._epsCleanup();
+            if (button._vqCleanup) {
+              button._vqCleanup();
             }
           });
           this._createdButtons = [];
@@ -1665,7 +1737,7 @@
         this._initialized = false;
 
         if (mode === "development") {
-          console.log("[EpsApplePay] Instance destroyed:", instanceId);
+          console.log("[VqDigitalWalletApple] Instance destroyed:", instanceId);
         }
       },
     };
@@ -1680,23 +1752,23 @@
      * @type {string}
      * @readonly
      */
-    EpsApplePay.version = VERSION;
+    VqDigitalWalletApple.version = VERSION;
 
     /**
      * Default configuration
      * @static
-     * @type {EpsApplePayConfig}
+     * @type {VqDigitalWalletAppleConfig}
      * @readonly
      */
-    EpsApplePay.defaults = extendDeep({}, DEFAULTS);
+    VqDigitalWalletApple.defaults = extendDeep({}, DEFAULTS);
 
     /**
      * Error codes
      * @static
-     * @type {Object<string, string>}
+     * @type {Object&lt;string, string>}
      * @readonly
      */
-    EpsApplePay.ERROR_CODES = Object.freeze
+    VqDigitalWalletApple.ERROR_CODES = Object.freeze
       ? Object.freeze(ERROR_CODES)
       : ERROR_CODES;
 
@@ -1705,7 +1777,7 @@
      * @static
      * @returns {{supported: boolean, missing: string[]}} Support status
      */
-    EpsApplePay.checkBrowserSupport = function () {
+    VqDigitalWalletApple.checkBrowserSupport = function () {
       var missing = [];
 
       if (typeof Promise === "undefined") missing.push("Promise");
@@ -1715,7 +1787,7 @@
       if (typeof AbortController === "undefined")
         missing.push("AbortController");
       if (
-        typeof window !== "undefined" &&
+        typeof window !== "undefined" &amp;&amp;
         typeof window.PaymentRequest === "undefined"
       ) {
         missing.push("PaymentRequest API");
@@ -1728,25 +1800,50 @@
     };
 
     // ============================================================================
-    // GLOBAL EXPORT & NOCONFLICT
+    // GLOBAL EXPORT &amp; NOCONFLICT
     // ============================================================================
 
     if (!noGlobal) {
-      var previousEpsApplePay = window.EpsApplePay;
+      var previousVqDigitalWalletApple = window.VqDigitalWalletApple;
 
       /**
-       * Restores previous window.EpsApplePay and returns this version
+       * Restores previous window.VqDigitalWalletApple and returns this version
        * @static
-       * @returns {EpsApplePay} EpsApplePay constructor
+       * @returns {VqDigitalWalletApple} VqDigitalWalletApple constructor
        */
-      EpsApplePay.noConflict = function () {
-        window.EpsApplePay = previousEpsApplePay;
-        return EpsApplePay;
+      VqDigitalWalletApple.noConflict = function () {
+        window.VqDigitalWalletApple = previousVqDigitalWalletApple;
+        return VqDigitalWalletApple;
       };
 
-      window.EpsApplePay = EpsApplePay;
+      window.VqDigitalWalletApple = VqDigitalWalletApple;
     }
 
-    return EpsApplePay;
+    return VqDigitalWalletApple;
   },
 );
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri May 15 2026 18:19:38 GMT+0200 (South Africa Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

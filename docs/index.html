@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3><a href="global.html">Global</a></h3>
+    
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="package">
+        <h3> </h3>		
+    </section>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    <section class="readme usertext">
+        <article><h1>vq-digitalwallet-apple</h1>
+<p><a href="https://www.npmjs.com/package/vq-digitalwallet-apple"><img src="https://badge.fury.io/js/vq-digitalwallet-apple.svg" alt="npm version"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+<a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-Ready-blue.svg" alt="TypeScript"></a></p>
+<p>A lightweight JavaScript client SDK for integrating <strong>Apple Pay</strong> into web applications via the Payment Request API. Features enterprise-grade input validation, per-instance rate limiting, secure merchant validation, session management, and structured error handling.</p>
+<hr>
+<h2>Features</h2>
+<ul>
+<li>Zero runtime dependencies — all packages are devDependencies only</li>
+<li>Dual build output: IIFE for CDN/browser, UMD for bundlers and npm</li>
+<li>Full TypeScript definitions (<code>.d.ts</code> included)</li>
+<li>38 passing tests including 16 OWASP security tests (CWE-20, CWE-79, CWE-116, CWE-400, CWE-770, CWE-1321)</li>
+<li>SRI integrity checking for the Apple Pay JS SDK CDN script</li>
+<li>Per-instance rate limiting (never shared across instances)</li>
+<li>Prototype pollution protection in deep merge utility</li>
+</ul>
+<hr>
+<h2>Browser Compatibility</h2>
+<p>Apple Pay via the Payment Request API is only available in specific browsers on Apple hardware:</p>
+<table>
+<thead>
+<tr>
+<th>Browser / Platform</th>
+<th>Support</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Safari (iOS)</td>
+<td>Full</td>
+<td>Native payment sheet</td>
+</tr>
+<tr>
+<td>Safari (macOS)</td>
+<td>Full</td>
+<td>Native payment sheet</td>
+</tr>
+<tr>
+<td>Chrome (iOS 18+)</td>
+<td>Via QR Relay</td>
+<td>Uses Apple's relay sheet</td>
+</tr>
+<tr>
+<td>Firefox (iOS 18+)</td>
+<td>Via QR Relay</td>
+<td>Same as Chrome</td>
+</tr>
+<tr>
+<td>Edge (iOS 18+)</td>
+<td>Via QR Relay</td>
+<td>Same as Chrome</td>
+</tr>
+<tr>
+<td>Chrome desktop</td>
+<td>Partial (QR modal if set up)</td>
+<td>Requires Apple relay</td>
+</tr>
+<tr>
+<td>Non-Apple desktop</td>
+<td>Not supported</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The SDK is fully compatible with Apple's QR-based handoff flow introduced in iOS 18.</p>
+<blockquote>
+<p><strong>Domain verification:</strong> Apple Pay on the web requires a domain association file at
+<code>/.well-known/apple-developer-merchantid-domain-association</code> on your HTTPS server.
+This is a one-time merchant setup step outside the scope of this SDK.</p>
+</blockquote>
+<hr>
+<h2>Installation</h2>
+<pre class="prettyprint source lang-bash"><code>npm install vq-digitalwallet-apple
+</code></pre>
+<pre class="prettyprint source lang-bash"><code>yarn add vq-digitalwallet-apple
+</code></pre>
+<p><strong>CDN (IIFE build)</strong></p>
+<pre class="prettyprint source lang-html"><code>&lt;script src=&quot;https://unpkg.com/vq-digitalwallet-apple@latest/vqdigitalwalletapple.js&quot;>&lt;/script>
+</code></pre>
+<hr>
+<h2>Quick Start</h2>
+<h3>Browser (IIFE via CDN)</h3>
+<pre class="prettyprint source lang-html"><code>&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>&lt;title>Apple Pay&lt;/title>&lt;/head>
+&lt;body>
+  &lt;div id=&quot;apple-pay-button&quot;>&lt;/div>
+
+  &lt;script src=&quot;https://unpkg.com/vq-digitalwallet-apple@latest/vqdigitalwalletapple.js&quot;>&lt;/script>
+  &lt;script>
+    var applePay = new VqDigitalWalletApple({
+      mode: 'production',
+      merchantIdentifier: 'merchant.com.example',
+      merchantName: 'Example Store',
+      validationEndpoint: 'https://your-server.com/applepay/validate',
+      onTokenGenerated: function(token, error) {
+        if (error) {
+          console.error('Payment failed:', error);
+        } else {
+          // Send token to your backend for authorisation
+          console.log('Token:', token);
+        }
+      }
+    });
+
+    applePay.initialize().then(function(isReady) {
+      if (isReady) {
+        applePay.createButton('apple-pay-button', {
+          amount: 99.99,
+          currency: 'ZAR',
+          countryCode: 'ZA'
+        });
+      }
+    });
+  &lt;/script>
+&lt;/body>
+&lt;/html>
+</code></pre>
+<h3>CommonJS / bundler</h3>
+<pre class="prettyprint source lang-javascript"><code>const VqDigitalWalletApple = require('vq-digitalwallet-apple');
+
+const applePay = new VqDigitalWalletApple({
+  mode: 'production',
+  merchantIdentifier: 'merchant.com.example',
+  merchantName: 'Example Store',
+  validationEndpoint: 'https://your-server.com/applepay/validate',
+  onTokenGenerated(token, error) {
+    if (error) handleError(error);
+    else sendTokenToBackend(token);
+  }
+});
+
+const isReady = await applePay.initialize();
+if (isReady) {
+  applePay.createButton(document.getElementById('pay-btn'), {
+    amount: 49.99,
+    currency: 'ZAR'
+  });
+}
+</code></pre>
+<h3>TypeScript</h3>
+<pre class="prettyprint source lang-typescript"><code>import VqDigitalWalletApple, {
+  VqDigitalWalletAppleConfig,
+  PaymentData,
+  PaymentResult
+} from 'vq-digitalwallet-apple';
+
+const config: VqDigitalWalletAppleConfig = {
+  mode: 'production',
+  merchantIdentifier: 'merchant.com.example',
+  merchantName: 'Example Store',
+  validationEndpoint: 'https://your-server.com/applepay/validate',
+  onTokenGenerated(token, error) {
+    if (error) console.error(error);
+    else console.log('Token:', token);
+  }
+};
+
+const applePay = new VqDigitalWalletApple(config);
+const isReady = await applePay.initialize();
+</code></pre>
+<hr>
+<h2>Configuration</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>merchantIdentifier</code></td>
+<td><code>string</code></td>
+<td>Yes</td>
+<td>—</td>
+<td>Apple Merchant ID. Format: <code>merchant.com.yourcompany</code></td>
+</tr>
+<tr>
+<td><code>merchantName</code></td>
+<td><code>string</code></td>
+<td>Yes</td>
+<td>—</td>
+<td>Shown in Apple Pay sheet. Max 100 chars.</td>
+</tr>
+<tr>
+<td><code>mode</code></td>
+<td><code>'development' | 'production'</code></td>
+<td>Yes</td>
+<td>—</td>
+<td>SDK environment</td>
+</tr>
+<tr>
+<td><code>validationEndpoint</code></td>
+<td><code>string</code></td>
+<td>No</td>
+<td><code>''</code></td>
+<td>Your server's merchant validation URL. Must start with <code>https://</code>. Max 512 chars.</td>
+</tr>
+<tr>
+<td><code>allowedCardNetworks</code></td>
+<td><code>string[]</code></td>
+<td>No</td>
+<td><code>['masterCard','visa']</code></td>
+<td>Supported card networks</td>
+</tr>
+<tr>
+<td><code>merchantCapabilities</code></td>
+<td><code>string[]</code></td>
+<td>No</td>
+<td><code>['supports3DS']</code></td>
+<td>Merchant capability flags</td>
+</tr>
+<tr>
+<td><code>buttonStyle</code></td>
+<td><code>'black' | 'white' | 'white-outline'</code></td>
+<td>No</td>
+<td><code>'black'</code></td>
+<td>Apple Pay button style</td>
+</tr>
+<tr>
+<td><code>buttonType</code></td>
+<td><code>'buy' | 'pay' | 'plain' | ...</code></td>
+<td>No</td>
+<td><code>'buy'</code></td>
+<td>Apple Pay button type</td>
+</tr>
+<tr>
+<td><code>buttonLocale</code></td>
+<td><code>string</code></td>
+<td>No</td>
+<td><code>'en-ZA'</code></td>
+<td>Button locale</td>
+</tr>
+<tr>
+<td><code>onTokenGenerated</code></td>
+<td><code>(token, error) =&gt; void</code></td>
+<td>No</td>
+<td><code>null</code></td>
+<td>Payment token callback</td>
+</tr>
+<tr>
+<td><code>scriptLoadTimeout</code></td>
+<td><code>number</code></td>
+<td>No</td>
+<td><code>10000</code></td>
+<td>SDK script load timeout (ms)</td>
+</tr>
+<tr>
+<td><code>requestTimeout</code></td>
+<td><code>number</code></td>
+<td>No</td>
+<td><code>30000</code></td>
+<td>Payment request timeout (ms)</td>
+</tr>
+<tr>
+<td><code>cspNonce</code></td>
+<td><code>string</code></td>
+<td>No</td>
+<td><code>''</code></td>
+<td>CSP nonce for injected scripts</td>
+</tr>
+<tr>
+<td><code>paymentOptions</code></td>
+<td><code>PaymentOptions</code></td>
+<td>No</td>
+<td>see below</td>
+<td>Payment Request API options</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Supported <code>buttonType</code> values:</strong> <code>plain</code>, <code>buy</code>, <code>pay</code>, <code>order</code>, <code>donate</code>, <code>subscribe</code>, <code>checkout</code>, <code>book</code>, <code>add-money</code>, <code>contribute</code>, <code>reload</code>, <code>rent</code>, <code>save</code>, <code>tip</code>, <code>top-up</code></p>
+<hr>
+<h2>API Reference</h2>
+<h3><code>initialize(): Promise&lt;boolean&gt;</code></h3>
+<p>Loads the Apple Pay JS SDK from Apple's CDN and checks whether the device supports Apple Pay via <code>PaymentRequest.canMakePayment()</code>.</p>
+<p>Returns <code>true</code> when Apple Pay is available, <code>false</code> when not supported on the current device/browser.</p>
+<pre class="prettyprint source lang-javascript"><code>applePay.initialize().then(function(isReady) {
+  if (isReady) {
+    // Show Apple Pay button
+  } else {
+    // Hide Apple Pay UI — device does not support Apple Pay
+  }
+});
+</code></pre>
+<hr>
+<h3><code>createButton(container, paymentData): HTMLElement</code></h3>
+<p>Creates an <code>&lt;apple-pay-button&gt;</code> element, appends it to <code>container</code>, and wires up click → payment flow. Call only after <code>initialize()</code> resolves <code>true</code>.</p>
+<pre class="prettyprint source lang-javascript"><code>applePay.createButton('container-id', {
+  amount: 29.99,
+  currency: 'ZAR',
+  countryCode: 'ZA',
+  description: 'Order #1234'
+});
+</code></pre>
+<hr>
+<h3><code>requestPayment(paymentData): Promise&lt;PaymentResult&gt;</code></h3>
+<p>Triggers the Apple Pay payment sheet directly (without a button).</p>
+<pre class="prettyprint source lang-javascript"><code>applePay.requestPayment({
+  amount: 99.99,
+  currency: 'ZAR',
+  countryCode: 'ZA'
+}).then(function(result) {
+  console.log('Token:', result.token);
+});
+</code></pre>
+<hr>
+<h3>Utility methods</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>generateTransactionId()</code></td>
+<td><code>string</code></td>
+<td>RFC 4122 v4 UUID</td>
+</tr>
+<tr>
+<td><code>encodeToBase64(data)</code></td>
+<td><code>string</code></td>
+<td>Base64 encode a string</td>
+</tr>
+<tr>
+<td><code>decodeFromBase64(b64)</code></td>
+<td><code>object</code></td>
+<td>Decode and JSON-parse a Base64 string</td>
+</tr>
+<tr>
+<td><code>getSessionToken()</code></td>
+<td><code>string | null</code></td>
+<td>Last successful payment token</td>
+</tr>
+<tr>
+<td><code>clearSessionToken()</code></td>
+<td><code>void</code></td>
+<td>Clears stored token</td>
+</tr>
+<tr>
+<td><code>isReady()</code></td>
+<td><code>boolean</code></td>
+<td>Whether Apple Pay is available</td>
+</tr>
+<tr>
+<td><code>abort()</code></td>
+<td><code>Promise&lt;void&gt;</code></td>
+<td>Abort in-progress payment</td>
+</tr>
+<tr>
+<td><code>destroy()</code></td>
+<td><code>void</code></td>
+<td>Full cleanup — call on unmount</td>
+</tr>
+<tr>
+<td><code>logError(msg, err, ctx, reqId)</code></td>
+<td><code>ErrorInfo</code></td>
+<td>Structured error log</td>
+</tr>
+<tr>
+<td><code>checkBrowserSupport()</code> <em>(static)</em></td>
+<td><code>{supported, missing}</code></td>
+<td>Check APIs without instantiation</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Error Codes</h2>
+<p>The SDK attaches a <code>code</code> property to thrown errors for programmatic handling.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Constant</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E001</td>
+<td><code>INVALID_CONFIG</code></td>
+<td>Configuration is malformed</td>
+</tr>
+<tr>
+<td>E002</td>
+<td><code>MISSING_MERCHANT_ID</code></td>
+<td><code>merchantIdentifier</code> is missing</td>
+</tr>
+<tr>
+<td>E003</td>
+<td><code>INVALID_MODE</code></td>
+<td>Mode must be <code>development</code> or <code>production</code></td>
+</tr>
+<tr>
+<td>E100</td>
+<td><code>BROWSER_UNSUPPORTED</code></td>
+<td>Browser lacks required APIs</td>
+</tr>
+<tr>
+<td>E101</td>
+<td><code>PAYMENT_REQUEST_API_UNSUPPORTED</code></td>
+<td>Payment Request API not available</td>
+</tr>
+<tr>
+<td>E102</td>
+<td><code>APPLE_PAY_UNAVAILABLE</code></td>
+<td>Device/Wallet not set up</td>
+</tr>
+<tr>
+<td>E200</td>
+<td><code>INITIALIZATION_FAILED</code></td>
+<td>SDK init failed</td>
+</tr>
+<tr>
+<td>E201</td>
+<td><code>RATE_LIMIT_EXCEEDED</code></td>
+<td>Too many requests (3 per second per instance)</td>
+</tr>
+<tr>
+<td>E202</td>
+<td><code>SCRIPT_LOAD_TIMEOUT</code></td>
+<td>Apple Pay JS timed out loading</td>
+</tr>
+<tr>
+<td>E203</td>
+<td><code>SCRIPT_LOAD_FAILED</code></td>
+<td>Apple Pay JS CDN fetch failed</td>
+</tr>
+<tr>
+<td>E204</td>
+<td><code>SRI_HASH_MISSING</code></td>
+<td>SRI integrity constant not configured</td>
+</tr>
+<tr>
+<td>E300</td>
+<td><code>PAYMENT_CANCELLED</code></td>
+<td>User dismissed the payment sheet</td>
+</tr>
+<tr>
+<td>E301</td>
+<td><code>PAYMENT_FAILED</code></td>
+<td>Payment rejected</td>
+</tr>
+<tr>
+<td>E302</td>
+<td><code>TOKEN_GENERATION_FAILED</code></td>
+<td>Could not encode token</td>
+</tr>
+<tr>
+<td>E303</td>
+<td><code>INVALID_PAYMENT_DATA</code></td>
+<td>Amount or currency validation failed</td>
+</tr>
+<tr>
+<td>E304</td>
+<td><code>MERCHANT_VALIDATION_FAILED</code></td>
+<td>Backend validation endpoint failed</td>
+</tr>
+<tr>
+<td>E400</td>
+<td><code>VALIDATION_ERROR</code></td>
+<td>Input validation failed</td>
+</tr>
+<tr>
+<td>E401</td>
+<td><code>SANITIZATION_ERROR</code></td>
+<td>Input sanitization failed</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Merchant Validation (Server-side requirement)</h2>
+<p>Apple Pay requires your server to perform a mutual TLS handshake with Apple's servers. The SDK's <code>validationEndpoint</code> must point to an HTTPS endpoint on your server that:</p>
+<ol>
+<li>Receives a <code>POST</code> with a JSON body containing <code>validationURL</code>, <code>merchantIdentifier</code>, <code>displayName</code>, and <code>domainName</code></li>
+<li>Makes an mTLS request to Apple's validation URL using your Apple Pay merchant certificate</li>
+<li>Returns the merchant session object received from Apple</li>
+</ol>
+<p>This server-side implementation is outside the scope of the client SDK. Refer to Apple's <a href="https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation">Merchant Validation documentation</a>.</p>
+<hr>
+<h2>Framework Examples</h2>
+<h3>React</h3>
+<pre class="prettyprint source lang-jsx"><code>import { useEffect, useRef } from 'react';
+import VqDigitalWalletApple from 'vq-digitalwallet-apple';
+
+function ApplePayButton({ amount, onSuccess }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const applePay = new VqDigitalWalletApple({
+      mode: 'production',
+      merchantIdentifier: 'merchant.com.example',
+      merchantName: 'Example Store',
+      validationEndpoint: 'https://your-server.com/applepay/validate',
+      onTokenGenerated(token, error) {
+        if (error) console.error(error);
+        else onSuccess(token);
+      }
+    });
+
+    applePay.initialize().then(isReady => {
+      if (isReady) {
+        applePay.createButton(containerRef.current, {
+          amount,
+          currency: 'ZAR',
+          countryCode: 'ZA'
+        });
+      }
+    });
+
+    return () => applePay.destroy();
+  }, [amount, onSuccess]);
+
+  return &lt;div ref={containerRef} />;
+}
+</code></pre>
+<h3>Vue</h3>
+<pre class="prettyprint source lang-vue"><code>&lt;template>
+  &lt;div ref=&quot;applePayButton&quot;>&lt;/div>
+&lt;/template>
+
+&lt;script>
+import VqDigitalWalletApple from 'vq-digitalwallet-apple';
+
+export default {
+  props: ['amount'],
+  mounted() { this.initApplePay(); },
+  beforeDestroy() { this.applePay?.destroy(); },
+  methods: {
+    async initApplePay() {
+      this.applePay = new VqDigitalWalletApple({
+        mode: 'production',
+        merchantIdentifier: 'merchant.com.example',
+        merchantName: 'Example Store',
+        validationEndpoint: 'https://your-server.com/applepay/validate',
+        onTokenGenerated: (token, error) =>
+          error ? this.$emit('payment-error', error) : this.$emit('payment-success', token)
+      });
+
+      const isReady = await this.applePay.initialize();
+      if (isReady) {
+        this.applePay.createButton(this.$refs.applePayButton, {
+          amount: this.amount,
+          currency: 'ZAR',
+          countryCode: 'ZA'
+        });
+      }
+    }
+  }
+};
+&lt;/script>
+</code></pre>
+<h3>Angular</h3>
+<pre class="prettyprint source lang-typescript"><code>// apple-pay.service.ts
+import { Injectable } from '@angular/core';
+import VqDigitalWalletApple, {
+  VqDigitalWalletAppleConfig,
+  PaymentData
+} from 'vq-digitalwallet-apple';
+
+@Injectable({ providedIn: 'root' })
+export class ApplePayService {
+  private sdk: VqDigitalWalletApple | null = null;
+
+  async initialize(config: VqDigitalWalletAppleConfig): Promise&lt;boolean> {
+    this.sdk = new VqDigitalWalletApple(config);
+    return this.sdk.initialize();
+  }
+
+  createButton(container: HTMLElement, data: PaymentData): HTMLElement {
+    return this.sdk!.createButton(container, data);
+  }
+
+  destroy(): void {
+    this.sdk?.destroy();
+    this.sdk = null;
+  }
+}
+</code></pre>
+<hr>
+<h2>Development</h2>
+<pre class="prettyprint source lang-bash"><code>git clone https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple.git
+cd vq-digitalwallet-apple
+npm install
+npm test          # 38 tests
+npm run build     # IIFE + UMD
+npm run lint      # ESLint
+npm run docs      # JSDoc → docs/
+</code></pre>
+<hr>
+<h2>Security</h2>
+<p>This SDK enforces the following protections:</p>
+<table>
+<thead>
+<tr>
+<th>CWE</th>
+<th>Attack</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CWE-79</td>
+<td>XSS via config fields</td>
+<td>Dangerous characters stripped from string inputs</td>
+</tr>
+<tr>
+<td>CWE-116</td>
+<td>Improper neutralization</td>
+<td><code>sanitizeString()</code> strips <code>&lt;&gt;\\</code> and encodes quotes</td>
+</tr>
+<tr>
+<td>CWE-20</td>
+<td>Improper input validation</td>
+<td>All config fields validated; null/empty config throws</td>
+</tr>
+<tr>
+<td>CWE-400</td>
+<td>Resource exhaustion</td>
+<td>Field length limits enforced; oversized input rejected</td>
+</tr>
+<tr>
+<td>CWE-770</td>
+<td>Allocation without limits</td>
+<td>Per-instance rate limiting (3 req/s); never shared</td>
+</tr>
+<tr>
+<td>CWE-1321</td>
+<td>Prototype pollution</td>
+<td><code>extendDeep()</code> filters <code>__proto__</code>, <code>constructor</code>, <code>prototype</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>License</h2>
+<p>MIT — see <a href="./LICENSE">LICENSE</a>.</p>
+<hr>
+<p><em>Made by <a href="https://github.com/Veritas-Quaesitor">Veritas Quaesitor</a></em></p></article>
+    </section>
+
+
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri May 15 2026 18:19:38 GMT+0200 (South Africa Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

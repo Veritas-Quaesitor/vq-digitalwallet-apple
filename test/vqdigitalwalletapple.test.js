@@ -1,10 +1,10 @@
-// test/epsapplepay.test.js
+// test/vqdigitalwalletapple.test.js
 
 const fs = require("fs");
 const path = require("path");
 
 const moduleCode = fs.readFileSync(
-  path.join(__dirname, "../src/epsapplepay.js"),
+  path.join(__dirname, "../src/vqdigitalwalletapple.js"),
   "utf8"
 );
 
@@ -35,21 +35,21 @@ mockWindow.location = {
   hostname: "example.com",
 };
 
-let EpsApplePay;
+let VqDigitalWalletApple;
 
 try {
   const fn = new Function(
-    "window","global","document","console",
-    "setTimeout","clearTimeout","btoa","atob","crypto",
-    "Promise","Date","Math","Array","Object","JSON",
-    "Error","TypeError","fetch","AbortController","CSS",
+    "window", "global", "document", "console",
+    "setTimeout", "clearTimeout", "btoa", "atob", "crypto",
+    "Promise", "Date", "Math", "Array", "Object", "JSON",
+    "Error", "TypeError", "fetch", "AbortController", "CSS",
     `
       ${moduleCode}
-      return window.EpsApplePay;
+      return window.VqDigitalWalletApple;
     `
   );
 
-  EpsApplePay = fn(
+  VqDigitalWalletApple = fn(
     mockWindow, mockWindow, mockWindow.document, mockWindow.console,
     mockWindow.setTimeout, mockWindow.clearTimeout,
     mockWindow.btoa, mockWindow.atob, mockWindow.crypto,
@@ -63,7 +63,7 @@ try {
   throw err;
 }
 
-if (!EpsApplePay) throw new Error("EpsApplePay not found");
+if (!VqDigitalWalletApple) throw new Error("VqDigitalWalletApple not found");
 
 // ============================================================================
 // HELPERS
@@ -104,7 +104,7 @@ function makePaymentData(o = {}) {
 }
 
 async function makeSdk(configOverrides = {}) {
-  const sdk = EpsApplePay(makeConfig(configOverrides));
+  const sdk = VqDigitalWalletApple(makeConfig(configOverrides));
   await sdk.initialize();
   return sdk;
 }
@@ -113,14 +113,14 @@ async function makeSdk(configOverrides = {}) {
 // MODULE LOADING
 // ============================================================================
 
-describe("EpsApplePay - Module loading", () => {
+describe("VqDigitalWalletApple - Module loading", () => {
   test("loaded and has version", () => {
-    expect(EpsApplePay).toBeDefined();
-    expect(EpsApplePay.version).toBeDefined();
+    expect(VqDigitalWalletApple).toBeDefined();
+    expect(VqDigitalWalletApple.version).toBeDefined();
   });
 
   test("can create instance without new", () => {
-    const sdk = EpsApplePay(makeConfig());
+    const sdk = VqDigitalWalletApple(makeConfig());
     expect(sdk).toBeDefined();
   });
 });
@@ -129,47 +129,46 @@ describe("EpsApplePay - Module loading", () => {
 // INITIALIZATION
 // ============================================================================
 
-describe("EpsApplePay - Initialization", () => {
+describe("VqDigitalWalletApple - Initialization", () => {
   let sdk;
 
   afterEach(async () => {
-    // Wait for any internal SDK timers to finish before destroying
     await new Promise((r) => setTimeout(r, 50));
     if (sdk && sdk.destroy) sdk.destroy();
     sdk = null;
   });
 
   test("valid config creates instance", () => {
-    sdk = EpsApplePay(makeConfig());
+    sdk = VqDigitalWalletApple(makeConfig());
     expect(sdk.config.merchantIdentifier).toBe("merchant.com.example");
   });
 
   test("missing merchantIdentifier throws", () => {
     expect(() =>
-      EpsApplePay(makeConfig({ merchantIdentifier: "" }))
+      VqDigitalWalletApple(makeConfig({ merchantIdentifier: "" }))
     ).toThrow(/merchantIdentifier/i);
   });
 
   test("missing merchantName throws", () => {
     expect(() =>
-      EpsApplePay(makeConfig({ merchantName: "" }))
+      VqDigitalWalletApple(makeConfig({ merchantName: "" }))
     ).toThrow(/merchantName/i);
   });
 
   test("invalid mode throws", () => {
     expect(() =>
-      EpsApplePay(makeConfig({ mode: "invalid" }))
+      VqDigitalWalletApple(makeConfig({ mode: "invalid" }))
     ).toThrow(/invalid mode/i);
   });
 
   test("initialize succeeds when canMakePayment true", async () => {
-    sdk = EpsApplePay(makeConfig());
+    sdk = VqDigitalWalletApple(makeConfig());
     await expect(sdk.initialize()).resolves.toBe(true);
   });
 
   test("initialize returns false when canMakePayment false", async () => {
     PaymentRequest.prototype.canMakePayment = jest.fn(() => Promise.resolve(false));
-    sdk = EpsApplePay(makeConfig());
+    sdk = VqDigitalWalletApple(makeConfig());
     await expect(sdk.initialize()).resolves.toBe(false);
   });
 });
@@ -178,7 +177,7 @@ describe("EpsApplePay - Initialization", () => {
 // PAYMENT FLOW
 // ============================================================================
 
-describe("EpsApplePay - Payment flow", () => {
+describe("VqDigitalWalletApple - Payment flow", () => {
   test("accepts valid payment data", async () => {
     const sdk = await makeSdk();
     expect(() => sdk.requestPayment(makePaymentData())).not.toThrow();
@@ -227,12 +226,12 @@ describe("EpsApplePay - Payment flow", () => {
 // CREATE BUTTON
 // ============================================================================
 
-describe("EpsApplePay - createButton", () => {
+describe("VqDigitalWalletApple - createButton", () => {
   let sdk;
   let container;
 
   beforeAll(async () => {
-    sdk = EpsApplePay(makeConfig());
+    sdk = VqDigitalWalletApple(makeConfig());
     await sdk.initialize();
   });
 
@@ -273,11 +272,11 @@ describe("EpsApplePay - createButton", () => {
 // UTILITIES
 // ============================================================================
 
-describe("EpsApplePay - utilities", () => {
+describe("VqDigitalWalletApple - utilities", () => {
   let sdk;
 
   beforeEach(() => {
-    sdk = EpsApplePay(makeConfig());
+    sdk = VqDigitalWalletApple(makeConfig());
   });
 
   afterEach(async () => {
@@ -320,11 +319,11 @@ describe("EpsApplePay - utilities", () => {
 // DESTROY & ABORT
 // ============================================================================
 
-describe("EpsApplePay - destroy & abort", () => {
+describe("VqDigitalWalletApple - destroy & abort", () => {
   let sdk;
 
   beforeEach(() => {
-    sdk = EpsApplePay(makeConfig());
+    sdk = VqDigitalWalletApple(makeConfig());
   });
 
   afterEach(async () => {
@@ -341,5 +340,157 @@ describe("EpsApplePay - destroy & abort", () => {
     sdk.destroy();
     expect(sdk.config).toBeNull();
     expect(sdk._initialized).toBe(false);
+  });
+});
+
+// ============================================================================
+// SECURITY — 16 CWE TESTS
+// ============================================================================
+
+describe("VqDigitalWalletApple - Security", () => {
+  // CWE-79: XSS via config fields (×2)
+
+  test("[CWE-79] rejects <script> tag in merchantName via sanitization", () => {
+    const sdk = VqDigitalWalletApple(makeConfig({
+      merchantName: "<script>alert(1)</script>",
+    }));
+    expect(sdk.config.merchantName).not.toMatch(/[<>]/);
+    sdk.destroy();
+  });
+
+  test('[CWE-79] rejects "><img onerror> payload in merchantName via sanitization', () => {
+    const sdk = VqDigitalWalletApple(makeConfig({
+      merchantName: '"><img src=x onerror=alert(1)>',
+    }));
+    expect(sdk.config.merchantName).not.toMatch(/[<>]/);
+    sdk.destroy();
+  });
+
+  // CWE-116: Improper neutralization (×1)
+
+  test("[CWE-116] sanitize strips dangerous chars from merchantName", () => {
+    const sdk = VqDigitalWalletApple(makeConfig({
+      merchantName: "Store<>&World",
+    }));
+    expect(sdk.config.merchantName).not.toMatch(/[<>]/);
+    expect(sdk.config.merchantName).toContain("Store");
+    sdk.destroy();
+  });
+
+  // CWE-400: Resource exhaustion (×3)
+
+  test("[CWE-400] merchantName truncated to 100 chars max", () => {
+    const longName = "A".repeat(200);
+    const sdk = VqDigitalWalletApple(makeConfig({ merchantName: longName }));
+    expect(sdk.config.merchantName.length).toBeLessThanOrEqual(100);
+    sdk.destroy();
+  });
+
+  test("[CWE-400] rejects validationEndpoint exceeding 512 chars", () => {
+    const longUrl = "https://example.com/" + "a".repeat(500);
+    expect(() =>
+      VqDigitalWalletApple(makeConfig({ validationEndpoint: longUrl }))
+    ).toThrow(/512/);
+  });
+
+  test("[CWE-400] invalid base64 throws 'Invalid base64 encoded payload'", () => {
+    const sdk = VqDigitalWalletApple(makeConfig());
+    expect(() => sdk.decodeFromBase64("!!!not-valid-base64!!!")).toThrow(
+      "Invalid base64 encoded payload"
+    );
+    sdk.destroy();
+  });
+
+  // CWE-1321: Prototype pollution (×1)
+
+  test("[CWE-1321] __proto__ pollution via JSON.parse does not infect Object.prototype", () => {
+    const malicious = JSON.parse(
+      '{"__proto__": {"polluted": true}, "merchantIdentifier": "merchant.com.example", "merchantName": "Test"}'
+    );
+    try {
+      VqDigitalWalletApple(malicious);
+    } catch (e) {
+      // May throw validation errors — that is acceptable
+    }
+    expect({}).not.toHaveProperty("polluted");
+    expect(Object.prototype.polluted).toBeUndefined();
+  });
+
+  // CWE-20: Improper input validation (×7)
+
+  test("[CWE-20] null config throws", () => {
+    expect(() => VqDigitalWalletApple(null)).toThrow();
+  });
+
+  test("[CWE-20] empty config throws", () => {
+    expect(() => VqDigitalWalletApple({})).toThrow();
+  });
+
+  test("[CWE-20] invalid buttonStyle throws", () => {
+    expect(() =>
+      VqDigitalWalletApple(makeConfig({ buttonStyle: "rainbow" }))
+    ).toThrow(/Invalid buttonStyle/i);
+  });
+
+  test("[CWE-20] invalid buttonType throws", () => {
+    expect(() =>
+      VqDigitalWalletApple(makeConfig({ buttonType: "explode" }))
+    ).toThrow(/Invalid buttonType/i);
+  });
+
+  test("[CWE-20] empty allowedCardNetworks throws", () => {
+    expect(() =>
+      VqDigitalWalletApple(makeConfig({ allowedCardNetworks: [] }))
+    ).toThrow(/allowedCardNetworks must be a non-empty array/i);
+  });
+
+  test("[CWE-20] invalid merchantCapabilities throws", () => {
+    expect(() =>
+      VqDigitalWalletApple(makeConfig({ merchantCapabilities: [] }))
+    ).toThrow(/merchantCapabilities must be a non-empty array/i);
+  });
+
+  test("[CWE-20] validationEndpoint not starting with https:// throws", () => {
+    expect(() =>
+      VqDigitalWalletApple(makeConfig({ validationEndpoint: "http://example.com/validate" }))
+    ).toThrow(/must start with https/i);
+  });
+
+  // CWE-770: Allocation without limits — rate limit per-instance (×1)
+
+  test("[CWE-770] rate limit is per-instance — exhausted instanceA does not affect instanceB", async () => {
+    const sdkA = VqDigitalWalletApple(makeConfig());
+    await sdkA.initialize();
+
+    const data = makePaymentData();
+
+    // Exhaust sdkA: 1st call starts the window, 2nd and 3rd stay inside it
+    sdkA.requestPayment(data).catch(() => {});
+    sdkA.requestPayment(data).catch(() => {});
+    sdkA.requestPayment(data).catch(() => {});
+
+    // 4th call on same instance must throw rate limit error
+    expect(() => sdkA.requestPayment(data)).toThrow(/rate limit/i);
+
+    // sdkB has its own fresh rate limiter — must NOT throw
+    const sdkB = VqDigitalWalletApple(makeConfig());
+    await sdkB.initialize();
+    expect(() => sdkB.requestPayment(data)).not.toThrow();
+
+    await new Promise((r) => setTimeout(r, 50));
+    sdkA.destroy();
+    sdkB.destroy();
+  });
+
+  // CWE-400: Non-JSON Base64 payload (×1)
+
+  test("[CWE-400] non-JSON base64 throws 'Failed to decode base64 payload'", () => {
+    const sdk = VqDigitalWalletApple(makeConfig());
+    // Encode a valid string that is NOT JSON
+    const notJsonB64 = btoa("this is not json");
+    expect(() => sdk.decodeFromBase64(notJsonB64)).toThrow(
+      "Failed to decode base64 payload"
+    );
+    sdk.destroy();
   });
 });

@@ -6,7 +6,7 @@
   },
   "opts": {
     "destination": "./docs/",
-    "template": "node_modules/better-docs",
+    "template": "node_modules/docdash",
     "recurse": true,
     "readme": "./README.md"
   },
@@ -21,7 +21,7 @@
     "allowUnknownTags": true
   },
   "metadata": {
-    "title": "EpsApplePay SDK Documentation",
+    "title": "VQ Digital Wallet Apple Pay SDK Documentation",
     "version": "1.1.0"
   }
 }

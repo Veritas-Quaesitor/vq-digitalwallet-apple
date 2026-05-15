@@ -22,22 +22,22 @@ const babelConfig = {
 
 module.exports = [
   {
-    input: 'src/epsapplepay.js',
+    input: 'src/vqdigitalwalletapple.js',
     output: {
-      file: 'epsapplepay.js',
+      file: 'vqdigitalwalletapple.js',
       format: 'iife',
-      name: 'EpsApplePay',
+      name: 'VqDigitalWalletApple',
       banner
     },
     context: 'window',
     plugins: [nodeResolve(), babel(babelConfig)]
   },
   {
-    input: 'src/epsapplepay.js',
+    input: 'src/vqdigitalwalletapple.js',
     output: {
-      file: 'dist/epsapplepay.min.js',
+      file: 'dist/vqdigitalwalletapple.min.js',
       format: 'umd',
-      name: 'EpsApplePay',
+      name: 'VqDigitalWalletApple',
       banner
     },
     context: 'window',

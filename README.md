@@ -1,158 +1,211 @@
-# 🚀 Ecentric Apple Pay Client SDK
+# vq-digitalwallet-apple
 
-[![npm version](https://badge.fury.io/js/ecentric-applepay-clientsdk.svg)](https://badge.fury.io/js/ecentric-applepay-clientsdk) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/) [![Browser Support](https://img.shields.io/badge/Browser-Modern-green.svg)](https://apps.abacus.ai/chatllm/?appId=118c521cbc&convoId=1100197764#browser-compatibility)
+[![npm version](https://badge.fury.io/js/vq-digitalwallet-apple.svg)](https://www.npmjs.com/package/vq-digitalwallet-apple)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
-A lightweight, JavaScript SDK for integrating **Apple Pay** with secure payment processing. Features advanced security, rate limiting, merchant validation, session management, and comprehensive error handling.
-
----
-
-## ✨ Features
-
-- 🔒 **Enterprise Security** - Advanced input validation and sanitization
-- ⚡ **Rate Limiting** - Protection against excessive payment requests
-- 🎯 **TypeScript Support** - Full `.d.ts` definitions included
-- 🍎 **Enabled for Apple Pay on the Web**
-- 📱 **Mobile Optimized** - Designed for modern commerce flows
-- 🛡️ **Error Handling** - Clean, structured, comprehensive errors
-- 📊 **Session Management** - Secure token storage and retrieval
-- 🔧 **Easy Integration** - Simple and intuitive API
+A lightweight JavaScript client SDK for integrating **Apple Pay** into web applications via the Payment Request API. Features enterprise-grade input validation, per-instance rate limiting, secure merchant validation, session management, and structured error handling.
 
 ---
 
-## 📦 Installation
+## Features
 
-### NPM
+- Zero runtime dependencies — all packages are devDependencies only
+- Dual build output: IIFE for CDN/browser, UMD for bundlers and npm
+- Full TypeScript definitions (`.d.ts` included)
+- 38 passing tests including 16 OWASP security tests (CWE-20, CWE-79, CWE-116, CWE-400, CWE-770, CWE-1321)
+- SRI integrity checking for the Apple Pay JS SDK CDN script
+- Per-instance rate limiting (never shared across instances)
+- Prototype pollution protection in deep merge utility
+
+---
+
+## Browser Compatibility
+
+Apple Pay via the Payment Request API is only available in specific browsers on Apple hardware:
+
+| Browser / Platform    | Support                     | Notes                          |
+| --------------------- | --------------------------- | ------------------------------ |
+| Safari (iOS)          | Full                        | Native payment sheet           |
+| Safari (macOS)        | Full                        | Native payment sheet           |
+| Chrome (iOS 18+)      | Via QR Relay                | Uses Apple's relay sheet       |
+| Firefox (iOS 18+)     | Via QR Relay                | Same as Chrome                 |
+| Edge (iOS 18+)        | Via QR Relay                | Same as Chrome                 |
+| Chrome desktop        | Partial (QR modal if set up)| Requires Apple relay           |
+| Non-Apple desktop     | Not supported               |                                |
+
+The SDK is fully compatible with Apple's QR-based handoff flow introduced in iOS 18.
+
+> **Domain verification:** Apple Pay on the web requires a domain association file at
+> `/.well-known/apple-developer-merchantid-domain-association` on your HTTPS server.
+> This is a one-time merchant setup step outside the scope of this SDK.
+
+---
+
+## Installation
 
 ```bash
-npm install ecentric-applepay-clientsdk
+npm install vq-digitalwallet-apple
 ```
-
-### Yarn
 
 ```bash
-yarn add ecentric-applepay-clientsdk
+yarn add vq-digitalwallet-apple
 ```
 
-### CDN
+**CDN (IIFE build)**
 
 ```html
-<script src="https://unpkg.com/ecentric-applepay-clientsdk@latest/epsapplepay.js"></script>
+<script src="https://unpkg.com/vq-digitalwallet-apple@latest/vqdigitalwalletapple.js"></script>
 ```
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-### Basic Implementation
-
-```javascript
-// Initialize Apple Pay SDK
-const applePay = new EpsApplePay({
-    mode: 'development', // or 'production'
-    merchantIdentifier: 'merchant.com.example',
-    merchantName: 'Your Store Name',
-    validationEndpoint: 'https://yourserver.com/applepay/validate',
-    onTokenGenerated: function(token, error) {
-        if (error) {
-            console.error('Payment failed:', error);
-        } else {
-            console.log('Payment token:', token);
-            // Send token to your backend for processing
-        }
-    }
-});
-
-// Initialize Apple Pay
-applePay.initialize()
-    .then(function(isReady) {
-        if (isReady) {
-            applePay.createButton('apple-pay-button', {
-                amount: 299.99,
-                currency: 'ZAR',
-                countryCode: 'ZA'
-            });
-        } else {
-            console.log('Apple Pay is not available');
-        }
-    })
-    .catch(function(error) {
-        console.error('Initialization failed:', error);
-    });
-```
-
----
-
-### HTML Structure
+### Browser (IIFE via CDN)
 
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Apple Pay Integration</title>
-</head>
+<head><title>Apple Pay</title></head>
 <body>
-    <div id="apple-pay-button"></div>
+  <div id="apple-pay-button"></div>
 
-    <script src="https://unpkg.com/ecentric-applepay-clientsdk@latest/epsapplepay.js"></script>
-    <script>
-        // Your SDK initialization here
-    </script>
+  <script src="https://unpkg.com/vq-digitalwallet-apple@latest/vqdigitalwalletapple.js"></script>
+  <script>
+    var applePay = new VqDigitalWalletApple({
+      mode: 'production',
+      merchantIdentifier: 'merchant.com.example',
+      merchantName: 'Example Store',
+      validationEndpoint: 'https://your-server.com/applepay/validate',
+      onTokenGenerated: function(token, error) {
+        if (error) {
+          console.error('Payment failed:', error);
+        } else {
+          // Send token to your backend for authorisation
+          console.log('Token:', token);
+        }
+      }
+    });
+
+    applePay.initialize().then(function(isReady) {
+      if (isReady) {
+        applePay.createButton('apple-pay-button', {
+          amount: 99.99,
+          currency: 'ZAR',
+          countryCode: 'ZA'
+        });
+      }
+    });
+  </script>
 </body>
 </html>
 ```
 
+### CommonJS / bundler
+
+```javascript
+const VqDigitalWalletApple = require('vq-digitalwallet-apple');
+
+const applePay = new VqDigitalWalletApple({
+  mode: 'production',
+  merchantIdentifier: 'merchant.com.example',
+  merchantName: 'Example Store',
+  validationEndpoint: 'https://your-server.com/applepay/validate',
+  onTokenGenerated(token, error) {
+    if (error) handleError(error);
+    else sendTokenToBackend(token);
+  }
+});
+
+const isReady = await applePay.initialize();
+if (isReady) {
+  applePay.createButton(document.getElementById('pay-btn'), {
+    amount: 49.99,
+    currency: 'ZAR'
+  });
+}
+```
+
+### TypeScript
+
+```typescript
+import VqDigitalWalletApple, {
+  VqDigitalWalletAppleConfig,
+  PaymentData,
+  PaymentResult
+} from 'vq-digitalwallet-apple';
+
+const config: VqDigitalWalletAppleConfig = {
+  mode: 'production',
+  merchantIdentifier: 'merchant.com.example',
+  merchantName: 'Example Store',
+  validationEndpoint: 'https://your-server.com/applepay/validate',
+  onTokenGenerated(token, error) {
+    if (error) console.error(error);
+    else console.log('Token:', token);
+  }
+};
+
+const applePay = new VqDigitalWalletApple(config);
+const isReady = await applePay.initialize();
+```
+
 ---
 
-## 📚 API Documentation
+## Configuration
 
-### Configuration Options
+| Option | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `merchantIdentifier` | `string` | Yes | — | Apple Merchant ID. Format: `merchant.com.yourcompany` |
+| `merchantName` | `string` | Yes | — | Shown in Apple Pay sheet. Max 100 chars. |
+| `mode` | `'development' \| 'production'` | Yes | — | SDK environment |
+| `validationEndpoint` | `string` | No | `''` | Your server's merchant validation URL. Must start with `https://`. Max 512 chars. |
+| `allowedCardNetworks` | `string[]` | No | `['masterCard','visa']` | Supported card networks |
+| `merchantCapabilities` | `string[]` | No | `['supports3DS']` | Merchant capability flags |
+| `buttonStyle` | `'black' \| 'white' \| 'white-outline'` | No | `'black'` | Apple Pay button style |
+| `buttonType` | `'buy' \| 'pay' \| 'plain' \| ...` | No | `'buy'` | Apple Pay button type |
+| `buttonLocale` | `string` | No | `'en-ZA'` | Button locale |
+| `onTokenGenerated` | `(token, error) => void` | No | `null` | Payment token callback |
+| `scriptLoadTimeout` | `number` | No | `10000` | SDK script load timeout (ms) |
+| `requestTimeout` | `number` | No | `30000` | Payment request timeout (ms) |
+| `cspNonce` | `string` | No | `''` | CSP nonce for injected scripts |
+| `paymentOptions` | `PaymentOptions` | No | see below | Payment Request API options |
 
-| Option                 | Type                            | Required | Default                 | Description                           |
-| ---------------------- | ------------------------------- | -------- | ----------------------- | ------------------------------------- |
-| `mode`                 | `'development' \| 'production'` | ✅        | -                       | SDK environment                       |
-| `merchantIdentifier`   | `string`                        | ✅        | -                       | Apple Merchant ID                     |
-| `merchantName`         | `string`                        | ✅        | -                       | Shown in Apple Pay sheet              |
-| `validationEndpoint`   | `string`                        | ✅        | -                       | Your server's merchant validation URL |
-| `allowedCardNetworks`  | `string[]`                      | ❌        | `['masterCard','visa']` | Supported networks                    |
-| `merchantCapabilities` | `string[]`                      | ❌        | `['supports3DS']`       | Capability flags                      |
-| `onTokenGenerated`     | `(token,error) => void`         | ❌        | `null`                  | Payment token callback                |
-| `scriptLoadTimeout`    | `number`                        | ❌        | `10000`                 | Script timeout                        |
-| `requestTimeout`       | `number`                        | ❌        | `30000`                 | Payment timeout                       |
+**Supported `buttonType` values:** `plain`, `buy`, `pay`, `order`, `donate`, `subscribe`, `checkout`, `book`, `add-money`, `contribute`, `reload`, `rent`, `save`, `tip`, `top-up`
 
 ---
 
-## Core Methods
+## API Reference
 
 ### `initialize(): Promise<boolean>`
 
-Initializes the SDK, loads Apple Pay JS, and checks availability.
+Loads the Apple Pay JS SDK from Apple's CDN and checks whether the device supports Apple Pay via `PaymentRequest.canMakePayment()`.
+
+Returns `true` when Apple Pay is available, `false` when not supported on the current device/browser.
 
 ```javascript
-applePay.initialize()
-  .then(isReady => {
-      if (isReady) {
-          console.log('Apple Pay is ready!');
-      } else {
-          console.log('Apple Pay unavailable');
-      }
-  })
-  .catch(error => {
-      console.error('Initialization failed:', error);
-  });
+applePay.initialize().then(function(isReady) {
+  if (isReady) {
+    // Show Apple Pay button
+  } else {
+    // Hide Apple Pay UI — device does not support Apple Pay
+  }
+});
 ```
 
 ---
 
 ### `createButton(container, paymentData): HTMLElement`
 
-Creates an `<apple-pay-button>` inside the given container.
+Creates an `<apple-pay-button>` element, appends it to `container`, and wires up click → payment flow. Call only after `initialize()` resolves `true`.
 
 ```javascript
-applePay.createButton('apple-pay-button', {
-    amount: 100,
-    currency: 'ZAR',
-    countryCode: 'ZA',
-    description: 'Product Name'
+applePay.createButton('container-id', {
+  amount: 29.99,
+  currency: 'ZAR',
+  countryCode: 'ZA',
+  description: 'Order #1234'
 });
 ```
 
@@ -160,210 +213,117 @@ applePay.createButton('apple-pay-button', {
 
 ### `requestPayment(paymentData): Promise<PaymentResult>`
 
-Triggers the Apple Pay sheet.
+Triggers the Apple Pay payment sheet directly (without a button).
 
 ```javascript
 applePay.requestPayment({
-    amount: 49.99,
-    currency: 'ZAR',
-    countryCode: 'ZA'
-})
-.then(result => {
-    console.log('Token received:', result.token);
-})
-.catch(err => {
-    console.error('Payment failed:', err);
+  amount: 99.99,
+  currency: 'ZAR',
+  countryCode: 'ZA'
+}).then(function(result) {
+  console.log('Token:', result.token);
 });
 ```
 
 ---
 
-### `validatePaymentData(paymentData): void`
+### Utility methods
 
-Throws if invalid.
-
-```javascript
-try {
-    applePay.validatePaymentData({
-        amount: 0,
-        currency: 'ZAR'
-    });
-} catch (err) {
-    console.error('Invalid payment data:', err.message);
-}
-```
-
----
-
-### Utility Methods
-
-#### `generateTransactionId()`
-
-```javascript
-const tx = applePay.generateTransactionId();
-console.log(tx);
-```
-
-#### `getSessionToken()`
-
-```javascript
-applePay.getSessionToken();
-```
-
-#### `clearSessionToken()`
-
-```javascript
-applePay.clearSessionToken();
-```
-
-#### `destroy()`
-
-```javascript
-applePay.destroy();
-```
+| Method | Returns | Description |
+|---|---|---|
+| `generateTransactionId()` | `string` | RFC 4122 v4 UUID |
+| `encodeToBase64(data)` | `string` | Base64 encode a string |
+| `decodeFromBase64(b64)` | `object` | Decode and JSON-parse a Base64 string |
+| `getSessionToken()` | `string \| null` | Last successful payment token |
+| `clearSessionToken()` | `void` | Clears stored token |
+| `isReady()` | `boolean` | Whether Apple Pay is available |
+| `abort()` | `Promise<void>` | Abort in-progress payment |
+| `destroy()` | `void` | Full cleanup — call on unmount |
+| `logError(msg, err, ctx, reqId)` | `ErrorInfo` | Structured error log |
+| `checkBrowserSupport()` *(static)* | `{supported, missing}` | Check APIs without instantiation |
 
 ---
 
-## 🔧 Advanced Usage
+## Error Codes
 
-### TypeScript Example
+The SDK attaches a `code` property to thrown errors for programmatic handling.
 
-```typescript
-import EpsApplePay, { 
-    EpsApplePayConfig, 
-    PaymentData, 
-    PaymentResult 
-} from 'ecentric-applepay-clientsdk';
-
-const config: EpsApplePayConfig = {
-    mode: 'development',
-    merchantIdentifier: 'merchant.com.example',
-    merchantName: 'Test Merchant',
-    validationEndpoint: '/api/validate',
-    onTokenGenerated: (token, error) => {
-        console.log(token, error);
-    }
-};
-
-const applePay = new EpsApplePay(config);
-```
-
----
-
-## 🌐 Browser Compatibility
-
-Apple Pay availability as of iOS 18+:
-
-| Browser / Platform    | Support                    | Notes                    |
-| --------------------- | -------------------------- | ------------------------ |
-| **Safari (iOS)**      | ✅ Full                     | Native sheet             |
-| **Safari (macOS)**    | ✅ Full                     | Native sheet             |
-| **Chrome (iOS 18+)**  | ✅ Via QR Redirect Modal    | Uses Apple’s relay sheet |
-| **Firefox (iOS 18+)** | ✅ Via QR Redirect Modal    | Same as Chrome           |
-| **Edge (iOS 18+)**    | ✅ Via QR Redirect Modal    | Same as Chrome           |
-| **Chrome desktop**    | ⚠️ QR modal if enabled     | Uses Apple relay screen  |
-| **Firefox desktop**   | ⚠️ QR modal if enabled     | Depends on iOS relaying  |
-| **In-App WebViews**   | ⚠️ Depends on entitlements | PR API required          |
-
-### Apple Pay on the Web (QR Relay Mode)
-
-Apple introduced **QR-based handoff**:
-
-- Non-Safari browsers show a modal with QR code
-- User scans with Apple device
-- Payment continues on Apple Wallet
-- Token delivered back to webpage
-
-**This SDK fully supports this flow.**
+| Code | Constant | Description |
+|---|---|---|
+| E001 | `INVALID_CONFIG` | Configuration is malformed |
+| E002 | `MISSING_MERCHANT_ID` | `merchantIdentifier` is missing |
+| E003 | `INVALID_MODE` | Mode must be `development` or `production` |
+| E100 | `BROWSER_UNSUPPORTED` | Browser lacks required APIs |
+| E101 | `PAYMENT_REQUEST_API_UNSUPPORTED` | Payment Request API not available |
+| E102 | `APPLE_PAY_UNAVAILABLE` | Device/Wallet not set up |
+| E200 | `INITIALIZATION_FAILED` | SDK init failed |
+| E201 | `RATE_LIMIT_EXCEEDED` | Too many requests (3 per second per instance) |
+| E202 | `SCRIPT_LOAD_TIMEOUT` | Apple Pay JS timed out loading |
+| E203 | `SCRIPT_LOAD_FAILED` | Apple Pay JS CDN fetch failed |
+| E204 | `SRI_HASH_MISSING` | SRI integrity constant not configured |
+| E300 | `PAYMENT_CANCELLED` | User dismissed the payment sheet |
+| E301 | `PAYMENT_FAILED` | Payment rejected |
+| E302 | `TOKEN_GENERATION_FAILED` | Could not encode token |
+| E303 | `INVALID_PAYMENT_DATA` | Amount or currency validation failed |
+| E304 | `MERCHANT_VALIDATION_FAILED` | Backend validation endpoint failed |
+| E400 | `VALIDATION_ERROR` | Input validation failed |
+| E401 | `SANITIZATION_ERROR` | Input sanitization failed |
 
 ---
 
-## 🔒 Security Features
+## Merchant Validation (Server-side requirement)
 
-- Input sanitization
-- Merchant validation
-- Rate limiting
-- Error normalization
-- Safe token management
-- UUID-based transaction IDs
+Apple Pay requires your server to perform a mutual TLS handshake with Apple's servers. The SDK's `validationEndpoint` must point to an HTTPS endpoint on your server that:
 
----
+1. Receives a `POST` with a JSON body containing `validationURL`, `merchantIdentifier`, `displayName`, and `domainName`
+2. Makes an mTLS request to Apple's validation URL using your Apple Pay merchant certificate
+3. Returns the merchant session object received from Apple
 
-## 🚨 Validation
-
-| Error                            | Description         | Solution                          |
-| -------------------------------- | ------------------- | --------------------------------- |
-| `merchantIdentifier is required` | Missing merchant ID | Provide Merchant ID               |
-| `validationEndpoint is required` | No backend URL      | Implement validation route        |
-| `Invalid mode`                   | Invalid config      | Use `development` or `production` |
-| `Amount must be greater than 0`  | Validation failure  | Fix amount                        |
-| `Too many payment requests`      | Rate limit exceeded | Slow down requests                |
+This server-side implementation is outside the scope of the client SDK. Refer to Apple's [Merchant Validation documentation](https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation).
 
 ---
 
-## 🚨 Error Codes
+## Framework Examples
 
-The SDK provides a `code` property on error objects for programmatic handling.
-
-| Code     | Constant                     | Description                                |
-| -------- | ---------------------------- | ------------------------------------------ |
-| **E001** | `INVALID_CONFIG`             | Configuration object is malformed          |
-| **E002** | `MISSING_MERCHANT_ID`        | `merchantIdentifier` is missing            |
-| **E003** | `INVALID_MODE`               | Mode must be `development` or `production` |
-| **E100** | `BROWSER_UNSUPPORTED`        | Browser does not support Apple Pay         |
-| **E102** | `APPLE_PAY_UNAVAILABLE`      | Hardware/Wallet not set up                 |
-| **E201** | `RATE_LIMIT_EXCEEDED`        | Too many requests (3 per second)           |
-| **E202** | `SCRIPT_LOAD_TIMEOUT`        | Apple Pay JS failed to load in time        |
-| **E300** | `PAYMENT_CANCELLED`          | User closed the Apple Pay sheet            |
-| **E301** | `PAYMENT_FAILED`             | Payment rejected by Apple/Bank             |
-| **E303** | `INVALID_PAYMENT_DATA`       | Amount or Currency validation failed       |
-| **E304** | `MERCHANT_VALIDATION_FAILED` | Backend validation endpoint failed         |
-
----
-
-## 📖 Examples
-
-### React Example
+### React
 
 ```jsx
-import React, { useEffect, useRef } from 'react';
-import EpsApplePay from 'ecentric-applepay-clientsdk';
+import { useEffect, useRef } from 'react';
+import VqDigitalWalletApple from 'vq-digitalwallet-apple';
 
-function ApplePayButton({ amount, onPaymentSuccess }) {
-    const buttonRef = useRef(null);
+function ApplePayButton({ amount, onSuccess }) {
+  const containerRef = useRef(null);
 
-    useEffect(() => {
-        const applePay = new EpsApplePay({
-            mode: 'development',
-            merchantIdentifier: 'merchant.com.example',
-            merchantName: 'React Store',
-            validationEndpoint: '/api/validate',
-            onTokenGenerated(token, error) {
-                if (error) console.error(error);
-                else onPaymentSuccess(token);
-            }
+  useEffect(() => {
+    const applePay = new VqDigitalWalletApple({
+      mode: 'production',
+      merchantIdentifier: 'merchant.com.example',
+      merchantName: 'Example Store',
+      validationEndpoint: 'https://your-server.com/applepay/validate',
+      onTokenGenerated(token, error) {
+        if (error) console.error(error);
+        else onSuccess(token);
+      }
+    });
+
+    applePay.initialize().then(isReady => {
+      if (isReady) {
+        applePay.createButton(containerRef.current, {
+          amount,
+          currency: 'ZAR',
+          countryCode: 'ZA'
         });
+      }
+    });
 
-        applePay.initialize().then(isReady => {
-            if (isReady) {
-                applePay.createButton(buttonRef.current, {
-                    amount,
-                    currency: 'ZAR',
-                    countryCode: 'ZA'
-                });
-            }
-        });
+    return () => applePay.destroy();
+  }, [amount, onSuccess]);
 
-        return () => applePay.destroy();
-    }, [amount, onPaymentSuccess]);
-
-    return <div ref={buttonRef}></div>;
+  return <div ref={containerRef} />;
 }
 ```
 
----
-
-### Vue Example
+### Vue
 
 ```vue
 <template>
@@ -371,7 +331,7 @@ function ApplePayButton({ amount, onPaymentSuccess }) {
 </template>
 
 <script>
-import EpsApplePay from 'ecentric-applepay-clientsdk';
+import VqDigitalWalletApple from 'vq-digitalwallet-apple';
 
 export default {
   props: ['amount'],
@@ -379,11 +339,11 @@ export default {
   beforeDestroy() { this.applePay?.destroy(); },
   methods: {
     async initApplePay() {
-      this.applePay = new EpsApplePay({
-        mode: 'development',
+      this.applePay = new VqDigitalWalletApple({
+        mode: 'production',
         merchantIdentifier: 'merchant.com.example',
-        merchantName: 'Vue Store',
-        validationEndpoint: '/api/validate',
+        merchantName: 'Example Store',
+        validationEndpoint: 'https://your-server.com/applepay/validate',
         onTokenGenerated: (token, error) =>
           error ? this.$emit('payment-error', error) : this.$emit('payment-success', token)
       });
@@ -402,116 +362,71 @@ export default {
 </script>
 ```
 
----
-
-### Angular Example
+### Angular
 
 ```typescript
 // apple-pay.service.ts
 import { Injectable } from '@angular/core';
-import EpsApplePay, { EpsApplePayConfig, PaymentData } from 'ecentric-applepay-clientsdk';
+import VqDigitalWalletApple, {
+  VqDigitalWalletAppleConfig,
+  PaymentData
+} from 'vq-digitalwallet-apple';
 
 @Injectable({ providedIn: 'root' })
 export class ApplePayService {
-  private applePay: any;
+  private sdk: VqDigitalWalletApple | null = null;
 
-  async initialize(config: EpsApplePayConfig) {
-    this.applePay = new EpsApplePay(config);
-    return this.applePay.initialize();
+  async initialize(config: VqDigitalWalletAppleConfig): Promise<boolean> {
+    this.sdk = new VqDigitalWalletApple(config);
+    return this.sdk.initialize();
   }
 
-  createButton(container: HTMLElement, data: PaymentData) {
-    return this.applePay.createButton(container, data);
+  createButton(container: HTMLElement, data: PaymentData): HTMLElement {
+    return this.sdk!.createButton(container, data);
   }
 
-  request(data: PaymentData) {
-    return this.applePay.requestPayment(data);
-  }
-
-  destroy() {
-    this.applePay?.destroy();
-  }
-}
-```
-
-```typescript
-// payment.component.ts
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ApplePayService } from './apple-pay.service';
-
-@Component({
-  selector: 'app-payment',
-  template: `<div #applePayButton></div>`
-})
-export class PaymentComponent implements OnInit {
-  @ViewChild('applePayButton') btn!: ElementRef;
-
-  constructor(private applePay: ApplePayService) {}
-
-  async ngOnInit() {
-    const ready = await this.applePay.initialize({
-      mode: 'development',
-      merchantIdentifier: 'merchant.com.example',
-      merchantName: 'Angular Store',
-      validationEndpoint: '/api/validate',
-      onTokenGenerated: (token, error) => console.log(token, error)
-    });
-
-    if (ready) {
-      this.applePay.createButton(this.btn.nativeElement, {
-        amount: 100,
-        currency: 'ZAR',
-        countryCode: 'ZA'
-      });
-    }
+  destroy(): void {
+    this.sdk?.destroy();
+    this.sdk = null;
   }
 }
 ```
 
 ---
 
-## Development Setup
+## Development
 
 ```bash
-git clone https://dev.azure.com/epsdev/OnlinePayments/_git/Ecentric.ApplePay.ClientSdk
+git clone https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple.git
+cd vq-digitalwallet-apple
 npm install
-npm test
-npm run build
-npm run docs
+npm test          # 38 tests
+npm run build     # IIFE + UMD
+npm run lint      # ESLint
+npm run docs      # JSDoc → docs/
 ```
 
 ---
 
-## 📝 License
+## Security
 
-MIT License — included in repository.
+This SDK enforces the following protections:
 
----
-
-## 🆘 Support
-
-- 📧 [support@ecentric.co.za](mailto:support@ecentric.co.za)
-- 📖 Docs: [https://ecentric.readme.io](https://ecentric.readme.io/)
-- 🐛 Issues: https://dev.azure.com/epsdev/OnlinePayments/_git/Ecentric.ApplePay.ClientSdk/issues
-
----
-
-## 🏷️ Version History
-
-### v1.1.0
-
-- TypeScript support
-- Full Apple Pay QR Relay compatibility
-- Improved validation
-- Rate limiting
-- Session token handling
-
-### v1.0.0
-
-- Core Apple Pay integration
-- Basic payment flow
-- Initial release
+| CWE | Attack | Mitigation |
+|---|---|---|
+| CWE-79 | XSS via config fields | Dangerous characters stripped from string inputs |
+| CWE-116 | Improper neutralization | `sanitizeString()` strips `<>\\` and encodes quotes |
+| CWE-20 | Improper input validation | All config fields validated; null/empty config throws |
+| CWE-400 | Resource exhaustion | Field length limits enforced; oversized input rejected |
+| CWE-770 | Allocation without limits | Per-instance rate limiting (3 req/s); never shared |
+| CWE-1321 | Prototype pollution | `extendDeep()` filters `__proto__`, `constructor`, `prototype` |
 
 ---
 
-### Made with ❤️ by [Ecentric](https://ecentric.co.za/)
+## License
+
+MIT — see [LICENSE](./LICENSE).
+
+---
+
+*Made by [Veritas Quaesitor](https://github.com/Veritas-Quaesitor)*

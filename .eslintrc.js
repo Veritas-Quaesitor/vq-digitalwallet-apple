@@ -15,7 +15,7 @@ module.exports = {
     'no-console': 'off'
   },
   globals: {
-    google: 'readonly',
+    ApplePaySession: 'readonly',
     define: 'readonly',
     module: 'readonly',
     exports: 'readonly'

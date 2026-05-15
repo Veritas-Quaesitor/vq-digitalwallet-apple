@@ -1,40 +1,22 @@
-# Source files
 src/
 tests/
 test/
 *.test.js
 *.spec.js
-
-# Development files
 .eslintrc*
 .babelrc*
 rollup.config.js
 jsdoc.conf.json
 jest.config.js
-
-# Documentation source
 docs/
-
-# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# OS files
 .DS_Store
 Thumbs.db
-
-# Logs
 *.log
 npm-debug.log*
-
-# Coverage
 coverage/
-
-# Build artifacts
-dist/
-build/
-
-# Development dependencies
+.claude/
 node_modules/

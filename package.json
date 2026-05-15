@@ -1,20 +1,21 @@
 {
-  "name": "ecentric-apple-clientsdk",
+  "name": "vq-digitalwallet-apple",
   "version": "1.1.0",
   "description": "A lightweight client SDK for initiating secure payment requests with Apple Pay, featuring enterprise-grade security and rate limiting.",
-  "main": "epsapplepay.js",
-  "types": "epsapplepay.d.ts",
+  "main": "vqdigitalwalletapple.js",
+  "module": "dist/vqdigitalwalletapple.min.js",
+  "types": "vqdigitalwalletapple.d.ts",
   "exports": {
     ".": {
-      "types": "./epsapplepay.d.ts",
-      "require": "./epsapplepay.js",
-      "default": "./epsapplepay.js"
+      "require": "./vqdigitalwalletapple.js",
+      "import": "./dist/vqdigitalwalletapple.min.js",
+      "types": "./vqdigitalwalletapple.d.ts"
     }
   },
   "files": [
-    "epsapplepay.js",
-    "dist/epsapplepay.min.js",
-    "epsapplepay.d.ts",
+    "vqdigitalwalletapple.js",
+    "dist/vqdigitalwalletapple.min.js",
+    "vqdigitalwalletapple.d.ts",
     "README.md",
     "LICENSE"
   ],
@@ -37,14 +38,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://dev.azure.com/epsdev/OnlinePayments/_git/Ecentric.ApplePay.ClientSdk"
+    "url": "https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple.git"
   },
-  "homepage": "https://dev.azure.com/epsdev/OnlinePayments/_git/Ecentric.ApplePay.ClientSdk",
+  "homepage": "https://veritas-quaesitor.github.io/vq-digitalwallet-apple/",
   "bugs": {
-    "url": "https://dev.azure.com/epsdev/OnlinePayments/_git/Ecentric.ApplePay.ClientSdk/issues"
+    "url": "https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple/issues"
   },
   "keywords": [
-    "ecentric",
+    "vq",
+    "veritas-quaesitor",
     "applepay",
     "apple-pay",
     "digitalwallets",
@@ -57,18 +59,19 @@
     "browser",
     "enterprise"
   ],
-  "author": {
-    "name": "Francois van Eeden",
-    "company": "Ecentric"
-  },
+  "author": "Veritas Quaesitor",
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@babel/preset-env": "^7.28.5",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^0.4.4",
-    "better-docs": "^2.7.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "docdash": "^2.0.2",
     "eslint": "^8.57.1",
     "http-server": "^14.1.1",
     "jest": "^30.2.0",

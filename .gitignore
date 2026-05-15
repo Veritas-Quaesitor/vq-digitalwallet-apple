@@ -1,11 +1,11 @@
 # Dependencies
 node_modules/
 
-# Documentation
-docs/
-
 # Build outputs
 dist/
+
+# Claude Code local config
+.claude/
 
 # Environment files
 .env
@@ -21,6 +21,11 @@ dist/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Test artifacts
+coverage/
+__snapshots__/
+.eslintcache
 
 # Logs
 *.log
