@@ -1,4 +1,4 @@
-(function (global, factory) {
+﻿(function (global, factory) {
   "use strict";
 
   if (typeof module === "object" && typeof module.exports === "object") {
@@ -83,6 +83,26 @@
      * @readonly
      */
     var DEFAULT_REQUEST_TIMEOUT_MS = 30000;
+
+    /**
+     * Allowlisted Apple Pay card network identifiers
+     * @constant {string[]}
+     * @readonly
+     */
+    var VALID_CARD_NETWORKS = [
+      "amex", "chinaUnionPay", "discover", "eftpos", "electron", "elo",
+      "interac", "jcb", "mada", "maestro", "masterCard", "mir",
+      "privateLabel", "visa", "vPay",
+    ];
+
+    /**
+     * Allowlisted Apple Pay merchant capability identifiers
+     * @constant {string[]}
+     * @readonly
+     */
+    var VALID_MERCHANT_CAPABILITIES = [
+      "supports3DS", "supportsCredit", "supportsDebit", "supportsEMV",
+    ];
 
     /**
      * Apple Pay SDK CDN URL
@@ -371,7 +391,24 @@
       // Remove HTML/script injection vectors
       var sanitized = input.replace(/[<>\\]/g, "");
 
-      // Encode quotes to preserve data while preventing injection
+      // Remove backtick (template literal injection vector)
+      sanitized = sanitized.replace(/`/g, "");
+
+      // Remove null bytes (can confuse length checks and parsers)
+      sanitized = sanitized.replace(/\0/g, "");
+
+      // Remove newlines and carriage returns (HTTP header injection)
+      sanitized = sanitized.replace(/[\r\n]/g, "");
+
+      // Remove Unicode bidi-override and direction-control characters
+      // U+200E/200F marks, U+202A-202E embedding/override, U+2066-2069 isolates, U+FEFF BOM
+      // Prevents visual spoofing of merchant name in the native payment sheet
+      sanitized = sanitized.replace(
+        new RegExp("[\u200E\u200F\u202A\u202B\u202C\u202D\u202E\u2066\u2067\u2068\u2069\uFEFF]", "g"),
+        ""
+      );
+
+            // Encode quotes to preserve data while preventing injection
       sanitized = sanitized.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
       // Trim whitespace
@@ -429,24 +466,11 @@
         ].join("-");
       }
 
-      // Fallback for legacy environments (less secure)
-      if (
-        typeof console !== "undefined" &&
-        typeof console.warn === "function"
-      ) {
-        console.warn(
-          "[VqDigitalWalletApple] Using insecure UUID generation (Math.random). " +
-            "Upgrade browser or add crypto polyfill for production use.",
-        );
-      }
-
-      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-          var r = (Math.random() * 16) | 0;
-          var v = c === "x" ? r : (r & 0x3) | 0x8;
-          return v.toString(16);
-        },
+      // No CSPRNG available — hard fail rather than degrade to Math.random.
+      // A cryptographically secure random source is required for payment processing.
+      throw new Error(
+        "crypto API unavailable. A secure random number generator is required. " +
+          "Use a modern browser or provide a crypto polyfill.",
       );
     }
 
@@ -725,6 +749,14 @@
         // Required fields
         if (isNullOrEmpty(config.merchantIdentifier)) {
           errors.push("merchantIdentifier is required");
+        } else if (
+          !/^merchant\.[a-zA-Z0-9]([a-zA-Z0-9\-.]*[a-zA-Z0-9])?$/.test(
+            config.merchantIdentifier,
+          )
+        ) {
+          errors.push(
+            "merchantIdentifier must follow the format merchant.com.yourcompany",
+          );
         }
 
         if (isNullOrEmpty(config.merchantName)) {
@@ -758,6 +790,16 @@
           config.allowedCardNetworks.length === 0
         ) {
           errors.push("allowedCardNetworks must be a non-empty array");
+        } else {
+          var invalidNetworks = config.allowedCardNetworks.filter(function (n) {
+            return VALID_CARD_NETWORKS.indexOf(n) === -1;
+          });
+          if (invalidNetworks.length > 0) {
+            errors.push(
+              "allowedCardNetworks contains unsupported networks: " +
+                invalidNetworks.join(", "),
+            );
+          }
         }
 
         // Validate merchant capabilities
@@ -766,6 +808,18 @@
           config.merchantCapabilities.length === 0
         ) {
           errors.push("merchantCapabilities must be a non-empty array");
+        } else {
+          var invalidCapabilities = config.merchantCapabilities.filter(
+            function (c) {
+              return VALID_MERCHANT_CAPABILITIES.indexOf(c) === -1;
+            },
+          );
+          if (invalidCapabilities.length > 0) {
+            errors.push(
+              "merchantCapabilities contains unsupported values: " +
+                invalidCapabilities.join(", "),
+            );
+          }
         }
 
         // Validate buttonStyle
@@ -1116,6 +1170,19 @@
           }
         }
 
+        // Description validation (if provided)
+        if (paymentData.description !== undefined) {
+          try {
+            paymentData.description = sanitizeString(
+              paymentData.description,
+              255,
+              "description",
+            );
+          } catch (e) {
+            errors.push(e.message);
+          }
+        }
+
         // Transaction ID validation (if provided)
         if (paymentData.transactionId !== undefined) {
           try {
@@ -1169,6 +1236,16 @@
           var timeoutId = setTimeout(function () {
             if (self._abortController) {
               self._abortController.abort();
+            }
+            if (
+              self._currentPaymentRequest &&
+              typeof self._currentPaymentRequest.abort === "function"
+            ) {
+              try {
+                self._currentPaymentRequest.abort();
+              } catch (e) {
+                // Ignore abort errors
+              }
             }
           }, this.config.requestTimeout);
 
@@ -1415,9 +1492,9 @@
             clearTimeout(timeoutId);
 
             if (!response.ok) {
-              throw new Error(
-                "Merchant validation failed with status: " + response.status,
-              );
+              var httpError = new Error("Merchant validation failed");
+              httpError.status = response.status;
+              throw httpError;
             }
             return response.json();
           })
@@ -1713,7 +1790,9 @@
      * @type {VqDigitalWalletAppleConfig}
      * @readonly
      */
-    VqDigitalWalletApple.defaults = extendDeep({}, DEFAULTS);
+    VqDigitalWalletApple.defaults = Object.freeze
+      ? Object.freeze(extendDeep({}, DEFAULTS))
+      : extendDeep({}, DEFAULTS);
 
     /**
      * Error codes

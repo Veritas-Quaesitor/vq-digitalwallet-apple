@@ -13,7 +13,7 @@ A lightweight JavaScript client SDK for integrating **Apple Pay** into web appli
 - Zero runtime dependencies — all packages are devDependencies only
 - Dual build output: IIFE for CDN/browser, UMD for bundlers and npm
 - Full TypeScript definitions (`.d.ts` included)
-- 38 passing tests including 16 OWASP security tests (CWE-20, CWE-79, CWE-116, CWE-400, CWE-770, CWE-1321)
+- 41 passing tests including 19 OWASP security tests (CWE-20, CWE-79, CWE-116, CWE-400, CWE-770, CWE-1321)
 - SRI integrity checking for the Apple Pay JS SDK CDN script
 - Per-instance rate limiting (never shared across instances)
 - Prototype pollution protection in deep merge utility

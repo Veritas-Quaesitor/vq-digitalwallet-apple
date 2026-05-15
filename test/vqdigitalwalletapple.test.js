@@ -456,6 +456,27 @@ describe("VqDigitalWalletApple - Security", () => {
     ).toThrow(/must start with https/i);
   });
 
+  test("[CWE-20] invalid card network in allowedCardNetworks throws", () => {
+    expect(() =>
+      VqDigitalWalletApple(makeConfig({ allowedCardNetworks: ["visa", "diners"] }))
+    ).toThrow(/unsupported networks/i);
+  });
+
+  test("[CWE-20] invalid merchantIdentifier format throws", () => {
+    expect(() =>
+      VqDigitalWalletApple(makeConfig({ merchantIdentifier: "my-merchant-id" }))
+    ).toThrow(/format/i);
+  });
+
+  test("[CWE-79] description with XSS payload is sanitized, not rejected", async () => {
+    const sdk = await makeSdk();
+    const data = makePaymentData({ description: "<script>alert(1)</script>" });
+    expect(() => sdk.requestPayment(data)).not.toThrow();
+    expect(data.description).not.toMatch(/[<>]/);
+    await new Promise((r) => setTimeout(r, 50));
+    sdk.destroy();
+  });
+
   // CWE-770: Allocation without limits — rate limit per-instance (×1)
 
   test("[CWE-770] rate limit is per-instance — exhausted instanceA does not affect instanceB", async () => {
