@@ -95,20 +95,24 @@
      */
     var VALID_MERCHANT_CAPABILITIES = ["supports3DS", "supportsCredit", "supportsDebit", "supportsEMV"];
 
+    // CDN URL pinned to an immutable versioned release (not the mutable 1.latest pointer).
+    // To upgrade: change the version in the URL, download the new file, and recompute the
+    // SRI hash with: openssl dgst -sha384 -binary apple-pay-sdk.js | openssl base64 -A
+
     /**
-     * Apple Pay SDK CDN URL
+     * Apple Pay SDK CDN URL — pinned to an immutable versioned release
      * @constant {string}
      * @readonly
      */
-    var APPLE_PAY_SDK_URL = "https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js";
+    var APPLE_PAY_SDK_URL = "https://applepay.cdn-apple.com/jsapi/v1.3.7/apple-pay-sdk.js";
 
     /**
-     * Subresource Integrity hash for Apple Pay SDK
+     * Subresource Integrity hash for Apple Pay SDK v1.3.7
      * @constant {string}
      * @readonly
      * @security Critical for preventing supply chain attacks
      */
-    var APPLE_PAY_SDK_SRI = "sha384-7KJIkGT+8p0K2rhsEQcz7zZ+nYUFUbN573ZKSgwp9YKN7uUC+h5TAhEIdOAZgo6R";
+    var APPLE_PAY_SDK_SRI = "sha384-m79g5rSF+8ObiCeY5RGEXjDpxURj/6A4rz0xXbEY/UEzLITgAWZ0+x3gcYjVEuVe";
 
     // ============================================================================
     // TYPE DEFINITIONS (JSDoc)
@@ -467,7 +471,15 @@
       // Check if already loaded by verifying script tag exists and is loaded
       var existingScript = document.querySelector('script[src*="applepay.cdn-apple.com"]');
       if (existingScript && existingScript.readyState !== "loading") {
-        return Promise.resolve(true);
+        // Only trust the existing script if its SRI hash matches ours.
+        // A pre-injected script without a matching integrity attribute could
+        // be a supply chain attack — remove it and reload securely.
+        if (existingScript.integrity === APPLE_PAY_SDK_SRI) {
+          return Promise.resolve(true);
+        }
+        if (existingScript.parentNode) {
+          existingScript.parentNode.removeChild(existingScript);
+        }
       }
       applePaySDKLoadingPromise = new Promise(function (resolve, reject) {
         // Validate SRI hash is configured
@@ -621,6 +633,7 @@
         this.config = extendDeep({}, DEFAULTS, config || {});
 
         // Initialize instance state
+        // Client-side UX guard only — not a security control; enforce rate limits server-side.
         this._rateLimiter = createRateLimiter();
         this._isReadyToPay = false;
         this._sessionToken = null;
@@ -1119,6 +1132,13 @@
       _handleMerchantValidation: function (event, requestId) {
         var self = this;
 
+        // Reject events not dispatched by the browser (isTrusted = false means
+        // the event was created by JavaScript, not the Payment Request API).
+        if (event && event.isTrusted === false) {
+          this.logError("Rejected untrusted merchantvalidation event", null, "_handleMerchantValidation", requestId);
+          return;
+        }
+
         // Validate event structure
         if (!event || typeof event.complete !== "function") {
           this.logError("Invalid merchant validation event", null, "_handleMerchantValidation", requestId);
@@ -1345,6 +1365,17 @@
        */
       clearSessionToken: function () {
         this._sessionToken = null;
+      },
+      /**
+       * Atomically returns and clears the stored session token (consume-once).
+       * Preferred over getSessionToken() — call immediately after dispatching
+       * the token to your backend to ensure the token is not accidentally re-read.
+       * @returns {string|null} The stored token, or null if none exists
+       */
+      consumeToken: function () {
+        var token = this._sessionToken;
+        this._sessionToken = null;
+        return token;
       },
       /**
        * Generates unique transaction identifier

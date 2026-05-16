@@ -13,7 +13,7 @@ A lightweight JavaScript client SDK for integrating **Apple Pay** into web appli
 - Zero runtime dependencies — all packages are devDependencies only
 - Dual build output: IIFE for CDN/browser, UMD for bundlers and npm
 - Full TypeScript definitions (`.d.ts` included)
-- 41 passing tests including 19 OWASP security tests (CWE-20, CWE-79, CWE-116, CWE-400, CWE-770, CWE-1321)
+- 43 passing tests including 21 OWASP security tests (CWE-20, CWE-79, CWE-116, CWE-346, CWE-400, CWE-613, CWE-770, CWE-1321)
 - SRI integrity checking for the Apple Pay JS SDK CDN script
 - Per-instance rate limiting (never shared across instances)
 - Prototype pollution protection in deep merge utility
@@ -236,6 +236,7 @@ applePay.requestPayment({
 | `decodeFromBase64(b64)` | `object` | Decode and JSON-parse a Base64 string |
 | `getSessionToken()` | `string \| null` | Last successful payment token |
 | `clearSessionToken()` | `void` | Clears stored token |
+| `consumeToken()` | `string \| null` | Atomically returns and clears the token — call this immediately after dispatching the token to your backend |
 | `isReady()` | `boolean` | Whether Apple Pay is available |
 | `abort()` | `Promise<void>` | Abort in-progress payment |
 | `destroy()` | `void` | Full cleanup — call on unmount |
@@ -418,8 +419,10 @@ This SDK enforces the following protections:
 | CWE-116 | Improper neutralization | `sanitizeString()` strips `<>\\` and encodes quotes |
 | CWE-20 | Improper input validation | All config fields validated; null/empty config throws |
 | CWE-400 | Resource exhaustion | Field length limits enforced; oversized input rejected |
-| CWE-770 | Allocation without limits | Per-instance rate limiting (3 req/s); never shared |
+| CWE-770 | Allocation without limits | Per-instance rate limiting (3 req/s); never shared. **Client-side UX guard only — enforce rate limits server-side for security.** |
 | CWE-1321 | Prototype pollution | `extendDeep()` filters `__proto__`, `constructor`, `prototype` |
+| CWE-346 | Untrusted event origin | `merchantvalidation` handler rejects events where `isTrusted !== true` |
+| CWE-613 | Insufficient session expiration | `consumeToken()` enforces consume-once semantics; pre-injected scripts verified by SRI before trust |
 
 ---
 

@@ -30,6 +30,7 @@ const mockWindow = {
   CSS: global.CSS,
 };
 
+
 mockWindow.location = {
   href: "https://example.com/checkout",
   hostname: "example.com",
@@ -512,6 +513,50 @@ describe("VqDigitalWalletApple - Security", () => {
     expect(() => sdk.decodeFromBase64(notJsonB64)).toThrow(
       "Failed to decode base64 payload"
     );
+    sdk.destroy();
+  });
+
+  // CWE-613: Pre-injected script bypasses SRI (×1)
+
+  test("[CWE-613] pre-injected script with wrong SRI is removed before reloading", async () => {
+    const fakeScript = {
+      src: "https://applepay.cdn-apple.com/jsapi/1.2.0/apple-pay-sdk.js",
+      integrity: "sha384-WRONG",
+      readyState: undefined,
+      parentNode: { removeChild: jest.fn() },
+    };
+    document.querySelector.mockReturnValueOnce(fakeScript);
+
+    const sdk = VqDigitalWalletApple(makeConfig());
+    await sdk.initialize();
+
+    expect(fakeScript.parentNode.removeChild).toHaveBeenCalledWith(fakeScript);
+    sdk.destroy();
+  });
+
+  // CWE-346: Untrusted merchantvalidation event (×1)
+
+  test("[CWE-346] untrusted merchantvalidation event is silently rejected", async () => {
+    const sdk = await makeSdk();
+    sdk.requestPayment(makePaymentData()).catch(() => {});
+
+    const request = sdk._currentPaymentRequest;
+    const handler =
+      request &&
+      request._eventHandlers &&
+      request._eventHandlers["merchantvalidation"];
+
+    if (handler) {
+      const fakeEvent = {
+        isTrusted: false,
+        complete: jest.fn(),
+        validationURL: "https://apple.com/validate",
+      };
+      handler(fakeEvent);
+      expect(fakeEvent.complete).not.toHaveBeenCalled();
+    }
+
+    await new Promise((r) => setTimeout(r, 50));
     sdk.destroy();
   });
 });

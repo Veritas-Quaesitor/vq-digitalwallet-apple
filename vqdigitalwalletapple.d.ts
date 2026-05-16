@@ -298,6 +298,13 @@ export declare class VqDigitalWalletApple {
   clearSessionToken(): void;
 
   /**
+   * Atomically returns and clears the stored session token (consume-once).
+   * Preferred over getSessionToken() — call immediately after dispatching
+   * the token to your backend.
+   */
+  consumeToken(): string | null;
+
+  /**
    * Generates a RFC 4122 v4 UUID suitable for use as a transaction ID.
    */
   generateTransactionId(): string;

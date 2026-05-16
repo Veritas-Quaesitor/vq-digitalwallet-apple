@@ -82,6 +82,12 @@ Object.defineProperty(document, "getElementById", {
   writable: true,
 });
 
+Object.defineProperty(document, "querySelector", {
+  value: jest.fn(() => null), // Default: no pre-existing script tag
+  writable: true,
+  configurable: true,
+});
+
 // Mock CSS.supports for createButton logic
 Object.defineProperty(global, "CSS", {
   value: {
