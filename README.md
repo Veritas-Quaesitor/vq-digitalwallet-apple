@@ -166,8 +166,8 @@ const isReady = await applePay.initialize();
 | `merchantIdentifier` | `string` | ✅ | — | Apple Merchant ID. Format: `merchant.com.yourcompany` |
 | `merchantName` | `string` | ✅ | — | Shown in Apple Pay sheet. Max 100 chars. |
 | `mode` | `'development' \| 'production'` | ✅ | — | SDK environment |
-| `validationEndpoint` | `string` | ❌ | `''` | Your server's merchant validation URL. Must start with `https://`. Max 512 chars. |
-| `allowedCardNetworks` | `string[]` | ❌ | `['masterCard','visa']` | Supported card networks |
+| `validationEndpoint` | `string` | ✅ | — | Your server's merchant validation URL. Must start with `https://`. Max 512 chars. |
+| `allowedCardNetworks` | `string[]` | ✅ | — | Supported card networks |
 | `merchantCapabilities` | `string[]` | ❌ | `['supports3DS']` | Merchant capability flags |
 | `buttonStyle` | `'black' \| 'white' \| 'white-outline'` | ❌ | `'black'` | Apple Pay button style |
 | `buttonType` | `'buy' \| 'pay' \| 'plain' \| ...` | ❌ | `'buy'` | Apple Pay button type |
