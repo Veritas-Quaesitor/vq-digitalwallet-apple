@@ -31,7 +31,7 @@ restore point for any new session on this project.
 
 ---
 
-## Current State (as of HEAD `55ff86a`)
+## Current State (as of HEAD `94bc0e8`)
 
 - 43/43 tests passing
 - 21 OWASP/CWE security tests covering: CWE-20, CWE-79, CWE-116, CWE-346, CWE-400, CWE-613, CWE-770, CWE-1321
@@ -41,6 +41,7 @@ restore point for any new session on this project.
 
 ### Commit history
 ```
+94bc0e8  docs: add CLAUDE.md session restore point and CONTRIBUTING.md
 55ff86a  security: harden OWASP findings 2, 6, 7, 9, 13 (43 tests, 21 CWE)
 2b25fbf  Security hardening: 8 CWE remediations from independent audit
 b608dd3  Rebrand EpsApplePay → vq-digitalwallet-apple v1.1.0 for public release
@@ -97,14 +98,15 @@ The `prepublishOnly` script runs `clean → build → test → lint` automatical
 1. **Rebrand** (`b608dd3`): Renamed all files and identifiers from `EpsApplePay`/`Ecentric` to `VqDigitalWalletApple`/Veritas Quaesitor. Updated all config files, LICENSE, README, TypeScript defs, docs.
 2. **Security round 1** (`2b25fbf`): 8 CWE remediations — removed Math.random fallback (CWE-330), extended sanitizeString (CWE-116), merchantIdentifier format validation (CWE-20), card network allowlist (CWE-285), description sanitization (CWE-1287), HTTP status removed from error messages (CWE-200), timeout wires PaymentRequest.abort() (CWE-404), defaults object frozen.
 3. **Security round 2** (`55ff86a`): isTrusted guard on merchantvalidation (CWE-346), CDN URL pinned to v1.3.7 with verified SRI (CWE-732), rate limiter documented as UX-only (CWE-285), consumeToken() consume-once method (CWE-613), pre-injected script SRI verification (CWE-613).
+4. **Docs / restore point** (`94bc0e8`): Created CLAUDE.md session restore point and CONTRIBUTING.md.
 
 ---
 
 ## What Is Next
 
 1. ~~Create CLAUDE.md~~ ✅
-2. Create `CONTRIBUTING.md`
-3. Rename local folder: `Ecentric.ApplePay.ClientSdk` → `vq-digitalwallet-apple`
+2. ~~Create `CONTRIBUTING.md`~~ ✅
+3. ~~Rename local folder: `Ecentric.ApplePay.ClientSdk` → `vq-digitalwallet-apple`~~ ✅
 4. Create GitHub remote repo (`Veritas-Quaesitor/vq-digitalwallet-apple`, public) and push
 5. Configure GitHub Pages to serve from `docs/` on `main`
 6. Apply branch protection on `main` (no force push, no delete)
