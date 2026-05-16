@@ -8,7 +8,7 @@
 
 A lightweight JavaScript client SDK for integrating **Apple Pay** into web applications via the Payment Request API. Features enterprise-grade input validation, per-instance rate limiting, secure merchant validation, session management, and structured error handling.
 
-📖 [JSDoc API Reference](https://veritas-quaesitor.github.io/vq-digitalwallet-apple/) &nbsp;|&nbsp; 🎬 [Live Demo](https://veritas-quaesitor.github.io/vq-digitalwallet-apple/demo.html)
+📖 [JSDoc API Reference](https://veritas-quaesitor.github.io/vq-digitalwallet-apple/global.html) &nbsp;|&nbsp; 🎬 [Live Demo](https://veritas-quaesitor.github.io/vq-digitalwallet-apple/demo.html)
 
 ---
 
