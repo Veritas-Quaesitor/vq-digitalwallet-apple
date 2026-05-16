@@ -1,38 +1,40 @@
-# vq-digitalwallet-apple
+# 🍎 VQ Digital Wallet Apple Pay SDK
 
 [![npm version](https://badge.fury.io/js/vq-digitalwallet-apple.svg)](https://www.npmjs.com/package/vq-digitalwallet-apple)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+[![Browser Support](https://img.shields.io/badge/Browser-Safari%20%7C%20iOS-lightgrey.svg)](#browser-compatibility)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://veritas-quaesitor.github.io/vq-digitalwallet-apple/)
 
 A lightweight JavaScript client SDK for integrating **Apple Pay** into web applications via the Payment Request API. Features enterprise-grade input validation, per-instance rate limiting, secure merchant validation, session management, and structured error handling.
 
 ---
 
-## Features
+## ✨ Features
 
-- Zero runtime dependencies — all packages are devDependencies only
-- Dual build output: IIFE for CDN/browser, UMD for bundlers and npm
-- Full TypeScript definitions (`.d.ts` included)
-- 43 passing tests including 21 OWASP security tests (CWE-20, CWE-79, CWE-116, CWE-346, CWE-400, CWE-613, CWE-770, CWE-1321)
-- SRI integrity checking for the Apple Pay JS SDK CDN script
-- Per-instance rate limiting (never shared across instances)
-- Prototype pollution protection in deep merge utility
+- 🔗 **Zero runtime dependencies** — all packages are devDependencies only
+- 📦 **Dual build output** — IIFE for CDN/browser, UMD for bundlers and npm
+- 🎯 **TypeScript support** — full `.d.ts` definitions included
+- ✅ **43 passing tests** — 21 security-focused
+- 🛡️ **SRI integrity checking** — Apple Pay JS SDK CDN script pinned and verified
+- ⚡ **Per-instance rate limiting** — never shared across instances
+- 🔒 **Prototype pollution protection** — deep merge utility filters dangerous keys
 
 ---
 
-## Browser Compatibility
+## 🌐 Browser Compatibility
 
 Apple Pay via the Payment Request API is only available in specific browsers on Apple hardware:
 
 | Browser / Platform    | Support                     | Notes                          |
 | --------------------- | --------------------------- | ------------------------------ |
-| Safari (iOS)          | Full                        | Native payment sheet           |
-| Safari (macOS)        | Full                        | Native payment sheet           |
-| Chrome (iOS 18+)      | Via QR Relay                | Uses Apple's relay sheet       |
-| Firefox (iOS 18+)     | Via QR Relay                | Same as Chrome                 |
-| Edge (iOS 18+)        | Via QR Relay                | Same as Chrome                 |
-| Chrome desktop        | Partial (QR modal if set up)| Requires Apple relay           |
-| Non-Apple desktop     | Not supported               |                                |
+| Safari (iOS)          | ✅ Full                     | Native payment sheet           |
+| Safari (macOS)        | ✅ Full                     | Native payment sheet           |
+| Chrome (iOS 18+)      | ✅ Via QR Relay             | Uses Apple's relay sheet       |
+| Firefox (iOS 18+)     | ✅ Via QR Relay             | Same as Chrome                 |
+| Edge (iOS 18+)        | ✅ Via QR Relay             | Same as Chrome                 |
+| Chrome desktop        | ⚠️ Partial                 | QR modal if Apple relay set up |
+| Non-Apple desktop     | ❌ Not supported            |                                |
 
 The SDK is fully compatible with Apple's QR-based handoff flow introduced in iOS 18.
 
@@ -42,17 +44,21 @@ The SDK is fully compatible with Apple's QR-based handoff flow introduced in iOS
 
 ---
 
-## Installation
+## 📦 Installation
+
+### npm
 
 ```bash
 npm install vq-digitalwallet-apple
 ```
 
+### Yarn
+
 ```bash
 yarn add vq-digitalwallet-apple
 ```
 
-**CDN (IIFE build)**
+### CDN (IIFE build)
 
 ```html
 <script src="https://unpkg.com/vq-digitalwallet-apple@latest/vqdigitalwalletapple.js"></script>
@@ -60,7 +66,7 @@ yarn add vq-digitalwallet-apple
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Browser (IIFE via CDN)
 
@@ -153,30 +159,30 @@ const isReady = await applePay.initialize();
 
 ---
 
-## Configuration
+## ⚙️ Configuration
 
 | Option | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `merchantIdentifier` | `string` | Yes | — | Apple Merchant ID. Format: `merchant.com.yourcompany` |
-| `merchantName` | `string` | Yes | — | Shown in Apple Pay sheet. Max 100 chars. |
-| `mode` | `'development' \| 'production'` | Yes | — | SDK environment |
-| `validationEndpoint` | `string` | No | `''` | Your server's merchant validation URL. Must start with `https://`. Max 512 chars. |
-| `allowedCardNetworks` | `string[]` | No | `['masterCard','visa']` | Supported card networks |
-| `merchantCapabilities` | `string[]` | No | `['supports3DS']` | Merchant capability flags |
-| `buttonStyle` | `'black' \| 'white' \| 'white-outline'` | No | `'black'` | Apple Pay button style |
-| `buttonType` | `'buy' \| 'pay' \| 'plain' \| ...` | No | `'buy'` | Apple Pay button type |
-| `buttonLocale` | `string` | No | `'en-ZA'` | Button locale |
-| `onTokenGenerated` | `(token, error) => void` | No | `null` | Payment token callback |
-| `scriptLoadTimeout` | `number` | No | `10000` | SDK script load timeout (ms) |
-| `requestTimeout` | `number` | No | `30000` | Payment request timeout (ms) |
-| `cspNonce` | `string` | No | `''` | CSP nonce for injected scripts |
-| `paymentOptions` | `PaymentOptions` | No | see below | Payment Request API options |
+| `merchantIdentifier` | `string` | ✅ | — | Apple Merchant ID. Format: `merchant.com.yourcompany` |
+| `merchantName` | `string` | ✅ | — | Shown in Apple Pay sheet. Max 100 chars. |
+| `mode` | `'development' \| 'production'` | ✅ | — | SDK environment |
+| `validationEndpoint` | `string` | ❌ | `''` | Your server's merchant validation URL. Must start with `https://`. Max 512 chars. |
+| `allowedCardNetworks` | `string[]` | ❌ | `['masterCard','visa']` | Supported card networks |
+| `merchantCapabilities` | `string[]` | ❌ | `['supports3DS']` | Merchant capability flags |
+| `buttonStyle` | `'black' \| 'white' \| 'white-outline'` | ❌ | `'black'` | Apple Pay button style |
+| `buttonType` | `'buy' \| 'pay' \| 'plain' \| ...` | ❌ | `'buy'` | Apple Pay button type |
+| `buttonLocale` | `string` | ❌ | `'en-ZA'` | Button locale |
+| `onTokenGenerated` | `(token, error) => void` | ❌ | `null` | Payment token callback |
+| `scriptLoadTimeout` | `number` | ❌ | `10000` | SDK script load timeout (ms) |
+| `requestTimeout` | `number` | ❌ | `30000` | Payment request timeout (ms) |
+| `cspNonce` | `string` | ❌ | `''` | CSP nonce for injected scripts |
+| `paymentOptions` | `PaymentOptions` | ❌ | see below | Payment Request API options |
 
 **Supported `buttonType` values:** `plain`, `buy`, `pay`, `order`, `donate`, `subscribe`, `checkout`, `book`, `add-money`, `contribute`, `reload`, `rent`, `save`, `tip`, `top-up`
 
 ---
 
-## API Reference
+## 📚 API Reference
 
 ### `initialize(): Promise<boolean>`
 
@@ -245,7 +251,7 @@ applePay.requestPayment({
 
 ---
 
-## Error Codes
+## 🚨 Error Codes
 
 The SDK attaches a `code` property to thrown errors for programmatic handling.
 
@@ -272,7 +278,7 @@ The SDK attaches a `code` property to thrown errors for programmatic handling.
 
 ---
 
-## Merchant Validation (Server-side requirement)
+## 🔐 Merchant Validation
 
 Apple Pay requires your server to perform a mutual TLS handshake with Apple's servers. The SDK's `validationEndpoint` must point to an HTTPS endpoint on your server that:
 
@@ -284,7 +290,7 @@ This server-side implementation is outside the scope of the client SDK. Refer to
 
 ---
 
-## Framework Examples
+## 🔧 Framework Examples
 
 ### React
 
@@ -353,8 +359,7 @@ export default {
       if (isReady) {
         this.applePay.createButton(this.$refs.applePayButton, {
           amount: this.amount,
-          currency: 'ZAR',
-          countryCode: 'ZA'
+          currency: 'ZAR'
         });
       }
     }
@@ -362,6 +367,8 @@ export default {
 };
 </script>
 ```
+
+> **Vue 3:** Replace `beforeDestroy()` with `beforeUnmount()`.
 
 ### Angular
 
@@ -395,38 +402,34 @@ export class ApplePayService {
 
 ---
 
-## Development
+## 💻 Development
 
 ```bash
 git clone https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple.git
 cd vq-digitalwallet-apple
 npm install
-npm test          # 38 tests
-npm run build     # IIFE + UMD
-npm run lint      # ESLint
-npm run docs      # JSDoc → docs/
+npm test            # 43 tests
+npm run build       # IIFE + UMD
+npm run lint        # ESLint
+npm run docs        # JSDoc → docs/
 ```
 
 ---
 
-## Security
+## 🔒 Security
 
-This SDK enforces the following protections:
-
-| CWE | Attack | Mitigation |
-|---|---|---|
-| CWE-79 | XSS via config fields | Dangerous characters stripped from string inputs |
-| CWE-116 | Improper neutralization | `sanitizeString()` strips `<>\\` and encodes quotes |
-| CWE-20 | Improper input validation | All config fields validated; null/empty config throws |
-| CWE-400 | Resource exhaustion | Field length limits enforced; oversized input rejected |
-| CWE-770 | Allocation without limits | Per-instance rate limiting (3 req/s); never shared. **Client-side UX guard only — enforce rate limits server-side for security.** |
-| CWE-1321 | Prototype pollution | `extendDeep()` filters `__proto__`, `constructor`, `prototype` |
-| CWE-346 | Untrusted event origin | `merchantvalidation` handler rejects events where `isTrusted !== true` |
-| CWE-613 | Insufficient session expiration | `consumeToken()` enforces consume-once semantics; pre-injected scripts verified by SRI before trust |
+- ✅ **Input sanitization** — dangerous characters stripped from all string config fields
+- ✅ **XSS protection** — `sanitizeString()` strips `<>\"'` before any value is used
+- ✅ **Prototype pollution protection** — `extendDeep()` filters `__proto__`, `constructor`, `prototype`
+- ✅ **Event origin validation** — `merchantvalidation` handler rejects events where `isTrusted !== true`
+- ✅ **SRI verification** — Apple Pay CDN script pinned with a verified integrity hash; pre-injected scripts checked before trust
+- ✅ **Consume-once tokens** — `consumeToken()` atomically returns and clears the session token
+- ✅ **Rate limiting** — 3 requests/second per instance as a UX safeguard. **Enforce rate limits independently on your server.**
+- ✅ **Field length limits** — oversized inputs rejected at validation time
 
 ---
 
-## License
+## 📄 License
 
 MIT — see [LICENSE](./LICENSE).
 
