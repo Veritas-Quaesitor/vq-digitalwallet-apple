@@ -13,7 +13,7 @@ restore point for any new session on this project.
 - **Author:** Veritas Quaesitor
 - **License:** MIT
 - **Local path (after folder rename):** `c:\Users\fvaneeden\source\vq-digitalwallet-apple\`
-- **GitHub remote (once created):** `https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple`
+- **GitHub remote:** `https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple`
 - **npm registry:** `https://www.npmjs.com/package/vq-digitalwallet-apple`
 
 ---
@@ -31,7 +31,7 @@ restore point for any new session on this project.
 
 ---
 
-## Current State (as of HEAD `94bc0e8`)
+## Current State (as of HEAD `c253e50`)
 
 - 43/43 tests passing
 - 21 OWASP/CWE security tests covering: CWE-20, CWE-79, CWE-116, CWE-346, CWE-400, CWE-613, CWE-770, CWE-1321
@@ -41,6 +41,7 @@ restore point for any new session on this project.
 
 ### Commit history
 ```
+c253e50  docs: bump CLAUDE.md restore point to HEAD 94bc0e8
 94bc0e8  docs: add CLAUDE.md session restore point and CONTRIBUTING.md
 55ff86a  security: harden OWASP findings 2, 6, 7, 9, 13 (43 tests, 21 CWE)
 2b25fbf  Security hardening: 8 CWE remediations from independent audit
@@ -99,6 +100,7 @@ The `prepublishOnly` script runs `clean → build → test → lint` automatical
 2. **Security round 1** (`2b25fbf`): 8 CWE remediations — removed Math.random fallback (CWE-330), extended sanitizeString (CWE-116), merchantIdentifier format validation (CWE-20), card network allowlist (CWE-285), description sanitization (CWE-1287), HTTP status removed from error messages (CWE-200), timeout wires PaymentRequest.abort() (CWE-404), defaults object frozen.
 3. **Security round 2** (`55ff86a`): isTrusted guard on merchantvalidation (CWE-346), CDN URL pinned to v1.3.7 with verified SRI (CWE-732), rate limiter documented as UX-only (CWE-285), consumeToken() consume-once method (CWE-613), pre-injected script SRI verification (CWE-613).
 4. **Docs / restore point** (`94bc0e8`): Created CLAUDE.md session restore point and CONTRIBUTING.md.
+5. **Session 2 catch-up** (`c253e50`): Bumped CLAUDE.md restore point, ticked off completed items, linked GitHub remote (`git remote add origin`).
 
 ---
 
@@ -107,7 +109,9 @@ The `prepublishOnly` script runs `clean → build → test → lint` automatical
 1. ~~Create CLAUDE.md~~ ✅
 2. ~~Create `CONTRIBUTING.md`~~ ✅
 3. ~~Rename local folder: `Ecentric.ApplePay.ClientSdk` → `vq-digitalwallet-apple`~~ ✅
-4. Create GitHub remote repo (`Veritas-Quaesitor/vq-digitalwallet-apple`, public) and push
-5. Configure GitHub Pages to serve from `docs/` on `main`
-6. Apply branch protection on `main` (no force push, no delete)
-7. `npm publish`
+4. ~~Create GitHub remote repo (`Veritas-Quaesitor/vq-digitalwallet-apple`, public)~~ ✅
+5. ~~Link remote locally (`git remote add origin`)~~ ✅
+6. Push `main` to GitHub
+7. Configure GitHub Pages to serve from `docs/` on `main`
+8. Apply branch protection on `main` (no force push, no delete)
+9. `npm publish`
