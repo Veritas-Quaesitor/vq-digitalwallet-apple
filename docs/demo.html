@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VQ Digital Wallet — Apple Pay SDK Demo</title>
+  <!-- Apple Pay JS SDK — registers the <apple-pay-button> web component -->
+  <script src="https://applepay.cdn-apple.com/jsapi/v1.3.7/apple-pay-sdk.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #000;
+      --surface:      #1c1c1e;
+      --surface2:     #2c2c2e;
+      --border:       #3a3a3c;
+      --text:         #f5f5f7;
+      --text2:        #86868b;
+      --accent:       #0071e3;
+      --code-bg:      #161617;
+      --success:      #30d158;
+      --font:         -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --font-mono:    'SF Mono', SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Hero ─────────────────────────────────────────────── */
+    .hero {
+      padding: 80px 0 64px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-emoji { font-size: 64px; margin-bottom: 16px; line-height: 1; }
+    .hero h1 {
+      font-size: clamp(34px, 5vw, 54px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .hero h1 .dim { color: var(--text2); font-weight: 400; }
+    .hero .tagline {
+      font-size: 19px;
+      color: var(--text2);
+      max-width: 580px;
+      margin: 0 auto 32px;
+    }
+    .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex;
+      border-radius: 6px;
+      overflow: hidden;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1;
+      border: 1px solid var(--border);
+      transition: opacity 0.15s;
+    }
+    .badge:hover { opacity: 0.8; }
+    .badge-label { background: var(--surface2); color: var(--text2); padding: 6px 10px; }
+    .badge-value { background: var(--surface);  color: var(--text);  padding: 6px 10px; }
+
+    /* ── Sections ─────────────────────────────────────────── */
+    .section     { padding: 72px 0; }
+    .section.alt { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    h3 { font-size: 22px; font-weight: 600; margin: 52px 0 8px; }
+    .sub { color: var(--text2); margin-bottom: 36px; font-size: 17px; }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface2);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ── Button showcase ──────────────────────────────────── */
+    .style-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .style-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .style-card-label {
+      background: var(--surface);
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+    }
+    .style-card-demo {
+      padding: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+    }
+    .bg-dark    { background: #1c1c1e; }
+    .bg-light   { background: #f5f5f7; }
+    .bg-outline { background: #e5e5ea; }
+
+    apple-pay-button {
+      --apple-pay-button-width: 180px;
+      --apple-pay-button-height: 46px;
+      --apple-pay-button-border-radius: 8px;
+    }
+
+    .types-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(156px, 1fr));
+      gap: 12px;
+    }
+    .type-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .type-item apple-pay-button {
+      --apple-pay-button-width: 136px;
+      --apple-pay-button-height: 36px;
+      --apple-pay-button-border-radius: 6px;
+    }
+    .type-label {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text2);
+      font-family: var(--font-mono);
+    }
+
+    .callout {
+      margin-top: 24px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+    .callout strong { color: var(--text); }
+
+    /* ── Prerequisites ────────────────────────────────────── */
+    .prereq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 16px;
+    }
+    .prereq-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .prereq-icon { font-size: 28px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+    .prereq-item h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .prereq-item p  { font-size: 14px; color: var(--text2); line-height: 1.6; }
+    .prereq-item a  { color: var(--accent); text-decoration: none; }
+    .prereq-item a:hover { text-decoration: underline; }
+
+    /* ── Code block ───────────────────────────────────────── */
+    .code-wrap {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .code-lang { font-size: 13px; font-weight: 600; color: var(--text2); }
+    .copy-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 12px;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover  { background: var(--border); }
+    .copy-btn.copied { color: var(--success); border-color: var(--success); }
+    pre {
+      margin: 0;
+      padding: 24px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: #e2e2e2;
+    }
+    .kw   { color: #ff7ab2; }
+    .str  { color: #ff8170; }
+    .cmt  { color: #6c7986; font-style: italic; }
+    .fn   { color: #78c2ff; }
+    .prop { color: #dabaff; }
+    .bool { color: #ff7ab2; }
+    .num  { color: #d9c97c; }
+
+    /* ── Validation flow ──────────────────────────────────── */
+    .flow { display: flex; flex-direction: column; max-width: 660px; margin: 0 auto; }
+    .flow-step { display: flex; gap: 20px; position: relative; }
+    .flow-step:not(:last-child) .flow-connector {
+      position: absolute;
+      left: 19px;
+      top: 42px;
+      bottom: -8px;
+      width: 2px;
+      background: var(--border);
+    }
+    .flow-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+      z-index: 1;
+    }
+    .flow-body  { padding: 4px 0 36px; }
+    .flow-body h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .flow-body p  { font-size: 14px; color: var(--text2); line-height: 1.6; }
+    .actor {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+    .a-browser { background: rgba(0,113,227,0.15); color: #0a84ff; }
+    .a-sdk     { background: rgba(48,209,88,0.15);  color: #30d158; }
+    .a-server  { background: rgba(255,159,10,0.15); color: #ff9f0a; }
+    .a-apple   { background: rgba(255,55,95,0.15);  color: #ff375f; }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    footer { border-top: 1px solid var(--border); padding: 40px 0; text-align: center; }
+    .footer-links { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .footer-links a { color: var(--accent); text-decoration: none; font-size: 15px; font-weight: 500; }
+    .footer-links a:hover { text-decoration: underline; }
+    footer p { color: var(--text2); font-size: 14px; }
+    footer a { color: var(--text2); }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 680px) {
+      .style-row    { grid-template-columns: 1fr; }
+      .prereq-grid  { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ HERO -->
+<header class="hero">
+  <div class="container">
+    <div class="hero-emoji">🍎</div>
+    <h1>VQ Digital Wallet<br><span class="dim">Apple Pay SDK</span></h1>
+    <p class="tagline">A lightweight JavaScript SDK for integrating Apple Pay into web applications via the W3C Payment Request API.</p>
+    <div class="badges">
+      <a href="https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple" class="badge">
+        <span class="badge-label">GitHub</span>
+        <span class="badge-value">vq-digitalwallet-apple</span>
+      </a>
+      <a href="https://veritas-quaesitor.github.io/vq-digitalwallet-apple/" class="badge">
+        <span class="badge-label">Docs</span>
+        <span class="badge-value">JSDoc API Reference</span>
+      </a>
+      <a href="https://www.npmjs.com/package/vq-digitalwallet-apple" class="badge">
+        <span class="badge-label">npm</span>
+        <span class="badge-value">vq-digitalwallet-apple</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════ BUTTON SHOWCASE -->
+<section class="section">
+  <div class="container">
+    <h2>Button Styles</h2>
+    <p class="sub">Three style variants, rendered using Apple's native <code>&lt;apple-pay-button&gt;</code> web component.</p>
+
+    <div class="style-row">
+      <div class="style-card">
+        <div class="style-card-label">Black</div>
+        <div class="style-card-demo bg-dark">
+          <apple-pay-button buttonstyle="black" type="buy"></apple-pay-button>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-card-label">White</div>
+        <div class="style-card-demo bg-light">
+          <apple-pay-button buttonstyle="white" type="buy"></apple-pay-button>
+        </div>
+      </div>
+      <div class="style-card">
+        <div class="style-card-label">White Outline</div>
+        <div class="style-card-demo bg-outline">
+          <apple-pay-button buttonstyle="white-outline" type="buy"></apple-pay-button>
+        </div>
+      </div>
+    </div>
+
+    <h3>Button Types</h3>
+    <p class="sub">All 15 supported <code>buttonType</code> values — shown in black style.</p>
+    <div class="types-grid" id="types-grid"></div>
+
+    <div class="callout">
+      <strong>Note:</strong> The <code>&lt;apple-pay-button&gt;</code> web component renders natively in Safari on macOS and iOS.
+      In other browsers the button may not be visible — this is expected. Your live integration will only present
+      the Apple Pay button to users on supported Apple devices, gated by <code>initialize()</code> returning <code>true</code>.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ PREREQUISITES -->
+<section class="section alt">
+  <div class="container">
+    <h2>Prerequisites</h2>
+    <p class="sub">Apple Pay on the web requires all four of the following to process a live payment.</p>
+    <div class="prereq-grid">
+      <div class="prereq-item">
+        <span class="prereq-icon">📱</span>
+        <div>
+          <h4>Apple device with Safari</h4>
+          <p>Safari on macOS or iOS, or any iOS 18+ browser via Apple's QR-based payment relay. Apple Pay will not fire on non-Apple hardware.</p>
+        </div>
+      </div>
+      <div class="prereq-item">
+        <span class="prereq-icon">🪪</span>
+        <div>
+          <h4>Apple Merchant ID</h4>
+          <p>Register a Merchant ID in the <a href="https://developer.apple.com" target="_blank" rel="noopener">Apple Developer portal</a>.
+          Format: <code>merchant.com.yourcompany</code></p>
+        </div>
+      </div>
+      <div class="prereq-item">
+        <span class="prereq-icon">🌐</span>
+        <div>
+          <h4>Verified HTTPS domain</h4>
+          <p>Apple verifies domain ownership via a signed file served at
+          <code>/.well-known/apple-developer-merchantid-domain-association</code>
+          over HTTPS. This is a one-time setup step per domain.</p>
+        </div>
+      </div>
+      <div class="prereq-item">
+        <span class="prereq-icon">🔒</span>
+        <div>
+          <h4>Server-side validation endpoint</h4>
+          <p>A backend HTTPS endpoint on your domain that proxies Apple's mTLS merchant validation handshake using your Apple Pay merchant certificate. See the flow below.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ QUICK START -->
+<section class="section">
+  <div class="container">
+    <h2>Quick Start</h2>
+    <p class="sub">Full integration in under 25 lines — including optional payer data and shipping fields.</p>
+    <div class="code-wrap">
+      <div class="code-header">
+        <span class="code-lang">JavaScript</span>
+        <button class="copy-btn" id="copy-btn" onclick="copyCode()">Copy</button>
+      </div>
+      <pre><code><span class="cmt">// npm:  const VqDigitalWalletApple = require('vq-digitalwallet-apple');</span>
+<span class="cmt">// CDN:  window.VqDigitalWalletApple (after loading vqdigitalwalletapple.js from unpkg)</span>
+
+<span class="kw">const</span> <span class="prop">applePay</span> = <span class="kw">new</span> <span class="fn">VqDigitalWalletApple</span>({
+  <span class="prop">mode</span>:                  <span class="str">'production'</span>,
+  <span class="prop">merchantIdentifier</span>:   <span class="str">'merchant.com.yourcompany'</span>,
+  <span class="prop">merchantName</span>:         <span class="str">'Your Store'</span>,
+  <span class="prop">validationEndpoint</span>:   <span class="str">'https://your-server.com/applepay/validate'</span>,
+  <span class="prop">allowedCardNetworks</span>:  [<span class="str">'visa'</span>, <span class="str">'masterCard'</span>],
+  <span class="prop">merchantCapabilities</span>: [<span class="str">'supports3DS'</span>],
+  <span class="prop">buttonStyle</span>:          <span class="str">'black'</span>,
+  <span class="prop">buttonType</span>:           <span class="str">'buy'</span>,
+  <span class="prop">paymentOptions</span>: {
+    <span class="prop">requestPayerName</span>:      <span class="bool">false</span>,
+    <span class="prop">requestPayerEmail</span>:     <span class="bool">false</span>,
+    <span class="prop">requestPayerPhone</span>:     <span class="bool">false</span>,
+    <span class="prop">requestBillingAddress</span>: <span class="bool">false</span>,
+    <span class="prop">requestShipping</span>:       <span class="bool">false</span>,
+    <span class="prop">shippingType</span>:          <span class="str">'shipping'</span>
+  },
+  <span class="prop">onTokenGenerated</span>(<span class="prop">token</span>, <span class="prop">error</span>) {
+    <span class="kw">if</span> (error) { console.<span class="fn">error</span>(<span class="str">'Payment failed:'</span>, error); <span class="kw">return</span>; }
+    <span class="cmt">// Send token to your backend for authorisation</span>
+    <span class="fn">fetch</span>(<span class="str">'/api/process-payment'</span>, {
+      <span class="prop">method</span>: <span class="str">'POST'</span>,
+      <span class="prop">headers</span>: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+      <span class="prop">body</span>: JSON.<span class="fn">stringify</span>({ token })
+    });
+  }
+});
+
+<span class="kw">const</span> <span class="prop">isReady</span> = <span class="kw">await</span> applePay.<span class="fn">initialize</span>();
+<span class="kw">if</span> (isReady) {
+  applePay.<span class="fn">createButton</span>(<span class="str">'pay-button-container'</span>, {
+    <span class="prop">amount</span>:      <span class="num">99.99</span>,
+    <span class="prop">currency</span>:    <span class="str">'ZAR'</span>,
+    <span class="prop">countryCode</span>: <span class="str">'ZA'</span>
+  });
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ VALIDATION FLOW -->
+<section class="section alt">
+  <div class="container">
+    <h2>Merchant Validation Flow</h2>
+    <p class="sub">Apple Pay requires a server-side mTLS handshake before the payment sheet is shown. Your backend acts as the relay.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-connector"></div>
+        <div class="flow-num">1</div>
+        <div class="flow-body">
+          <span class="actor a-browser">Browser</span>
+          <h4>User clicks the Apple Pay button</h4>
+          <p>The SDK calls <code>PaymentRequest.show()</code>. The browser fires a <code>merchantvalidation</code> event
+          containing a one-time Apple-issued <code>validationURL</code>.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-connector"></div>
+        <div class="flow-num">2</div>
+        <div class="flow-body">
+          <span class="actor a-sdk">SDK</span>
+          <h4>SDK POSTs to your <code>validationEndpoint</code></h4>
+          <p>The SDK extracts the <code>validationURL</code>, validates it against <code>*.apple.com</code>, then POSTs
+          <code>{ validationURL, merchantIdentifier, displayName, domainName }</code> to the endpoint you configured.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-connector"></div>
+        <div class="flow-num">3</div>
+        <div class="flow-body">
+          <span class="actor a-server">Your server</span>
+          <h4>mTLS request to Apple</h4>
+          <p>Using your Apple Pay merchant certificate, your server makes a mutual TLS request to Apple's
+          <code>validationURL</code> and receives a signed, time-limited merchant session object.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-connector"></div>
+        <div class="flow-num">4</div>
+        <div class="flow-body">
+          <span class="actor a-server">Your server</span>
+          <h4>Merchant session returned to SDK</h4>
+          <p>Your endpoint returns the raw merchant session JSON. The SDK calls <code>event.complete(session)</code>
+          to unlock the Apple Pay sheet for the user.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-connector"></div>
+        <div class="flow-num">5</div>
+        <div class="flow-body">
+          <span class="actor a-browser">Browser</span>
+          <h4>User authorizes payment</h4>
+          <p>The Apple Pay sheet presents the amount, merchant name, card selector, and a biometric authentication prompt
+          (Face ID / Touch ID). The user does not enter card details manually.</p>
+        </div>
+      </div>
+
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-body">
+          <span class="actor a-sdk">SDK</span>
+          <h4><code>onTokenGenerated</code> called with payment token</h4>
+          <p>The SDK Base64-encodes the encrypted payment token and calls your <code>onTokenGenerated</code> callback.
+          Forward the token to your payment processor for authorisation and settlement.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="max-width: 660px; margin: 32px auto 0;">
+      <div class="callout">
+        Server-side merchant validation is outside the scope of this SDK. See Apple's
+        <a href="https://developer.apple.com/documentation/apple_pay_on_the_web/apple_pay_js_api/providing_merchant_validation"
+           target="_blank" rel="noopener" style="color: var(--accent)">Merchant Validation documentation</a>
+        for the mTLS implementation guide.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-links">
+      <a href="https://veritas-quaesitor.github.io/vq-digitalwallet-apple/">JSDoc API</a>
+      <a href="https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple">GitHub</a>
+      <a href="https://github.com/Veritas-Quaesitor/vq-digitalwallet-apple/blob/main/README.md">README</a>
+    </div>
+    <p>MIT License &mdash; <a href="https://github.com/Veritas-Quaesitor" target="_blank" rel="noopener">Veritas Quaesitor</a></p>
+  </div>
+</footer>
+
+<script>
+  var BUTTON_TYPES = [
+    'plain', 'buy', 'pay', 'order', 'donate', 'subscribe',
+    'checkout', 'book', 'add-money', 'contribute', 'reload',
+    'rent', 'save', 'tip', 'top-up'
+  ];
+
+  var grid = document.getElementById('types-grid');
+  BUTTON_TYPES.forEach(function(type) {
+    var item = document.createElement('div');
+    item.className = 'type-item';
+    var btn = document.createElement('apple-pay-button');
+    btn.setAttribute('buttonstyle', 'black');
+    btn.setAttribute('type', type);
+    var label = document.createElement('div');
+    label.className = 'type-label';
+    label.textContent = type;
+    item.appendChild(btn);
+    item.appendChild(label);
+    grid.appendChild(item);
+  });
+
+  var RAW_CODE = [
+    "// npm:  const VqDigitalWalletApple = require('vq-digitalwallet-apple');",
+    "// CDN:  window.VqDigitalWalletApple (after loading vqdigitalwalletapple.js from unpkg)",
+    "",
+    "const applePay = new VqDigitalWalletApple({",
+    "  mode:                  'production',",
+    "  merchantIdentifier:   'merchant.com.yourcompany',",
+    "  merchantName:         'Your Store',",
+    "  validationEndpoint:   'https://your-server.com/applepay/validate',",
+    "  allowedCardNetworks:  ['visa', 'masterCard'],",
+    "  merchantCapabilities: ['supports3DS'],",
+    "  buttonStyle:          'black',",
+    "  buttonType:           'buy',",
+    "  paymentOptions: {",
+    "    requestPayerName:      false,",
+    "    requestPayerEmail:     false,",
+    "    requestPayerPhone:     false,",
+    "    requestBillingAddress: false,",
+    "    requestShipping:       false,",
+    "    shippingType:          'shipping'",
+    "  },",
+    "  onTokenGenerated(token, error) {",
+    "    if (error) { console.error('Payment failed:', error); return; }",
+    "    // Send token to your backend for authorisation",
+    "    fetch('/api/process-payment', {",
+    "      method: 'POST',",
+    "      headers: { 'Content-Type': 'application/json' },",
+    "      body: JSON.stringify({ token })",
+    "    });",
+    "  }",
+    "});",
+    "",
+    "const isReady = await applePay.initialize();",
+    "if (isReady) {",
+    "  applePay.createButton('pay-button-container', {",
+    "    amount:      99.99,",
+    "    currency:    'ZAR',",
+    "    countryCode: 'ZA'",
+    "  });",
+    "}"
+  ].join('\n');
+
+  function copyCode() {
+    var btn = document.getElementById('copy-btn');
+    if (!navigator.clipboard) {
+      btn.textContent = 'Not supported';
+      return;
+    }
+    navigator.clipboard.writeText(RAW_CODE).then(function() {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
